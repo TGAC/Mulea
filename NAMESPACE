@@ -2,5 +2,6 @@
 import(DBI)
 import(RSQLite)
 # Exports:
-export(invokeCppCodeOnCLI)
-export(createLocalDatabase)
+export(createLocalDatabaseSchema)
+export(addModelToLocalDatabase)
+export(runGSEA)

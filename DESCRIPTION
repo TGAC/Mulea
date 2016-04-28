@@ -1,16 +1,33 @@
+#: TODO : Type not set fields.
+#: DESCRIPTION uses a simple file format called DCF, the Debian control format.
+#: TODO : Check all licenses of packages which we use in Mulea.
 Package: Mulea
 Type: Package
 Title: What the Package Does (Title Case)
-Version: 0.1.0
+#: TODO : <major>.<minor>.<patch>.<dev >= 9000>
+Version: 0.0.0.9000
 Date: 2016-04-08
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
+#: Roles list: http://www.loc.gov/marc/relators/relaterm.html
+#: TODO : More people with roles, chack roles.
+Authors@R: c(
+    person("Wiktor", "Jurkowski", email = "Wiktor.Jurkowski@tgac.ac.uk", role = "aut"),
+    person("Eszter", "Ari", email = "AriEszter@gmail.com", role = "aut"),
+    person("Cezary", "Turek", email = "Cezary.Turek@gmail.com", role =  c("aut", "cre")),
+    person("Peter", "Forgacs", email = "Peter.Forgacs3@gmail.com", role =  "ctb"))
 Description: More about what it does (maybe more than one line)
-License: GNU GPL
+License: GPL-2
 LazyData: TRUE
-Imports: DBI, RSQLite
+Imports:
+    DBI (>= 0.3.1),
+    RSQLite (>= 1.0.0)
 Depends:
-Collate: hello.R
+    R (>= 3.2.5)
+Suggests:
+LinkingTo:
+Collate:
+    hello.R
+URL: http://yihui.name/knitr/
+BugReports: https://github.com/yihui/knitr/issues
 #: Descripe package in BioConductor structure
 #: https://www.bioconductor.org/packages/devel/BiocViews.html#___Software
 BiocViews:
