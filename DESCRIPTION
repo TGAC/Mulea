@@ -25,7 +25,9 @@ Depends:
 Suggests:
 LinkingTo:
 Collate:
-    hello.R
+    'Mulea.R'
+    'LocalDb.R'
+    'Gsea.R'
 URL: http://yihui.name/knitr/
 BugReports: https://github.com/yihui/knitr/issues
 #: Descripe package in BioConductor structure

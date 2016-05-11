@@ -4,4 +4,6 @@ import(RSQLite)
 # Exports:
 export(createLocalDatabaseSchema)
 export(addModelToLocalDatabase)
+export(removeModelFromLocalDatabase)
+export(saveModelFromLocalDatabaseToFile)
 export(runGSEA)
