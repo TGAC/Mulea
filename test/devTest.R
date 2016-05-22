@@ -36,3 +36,6 @@ removeFromLocalDB1 <- Mulea::removeModelFromLocalDatabase(taxonomy_id = 9016, mo
 
 getData <- Mulea::saveModelFromLocalDatabaseToFile(filePath = "/home/koralgooll/doktorat/Rpackages/mulea/Mulea/example/savedModel.txt",
                                                    taxonomy_id = 9006, model_source = 'File', version = 0)
+
+vignette(package = "Mulea")
+vignette("Mulea")

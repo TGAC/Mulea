@@ -7,6 +7,8 @@ http://dba.stackexchange.com/questions/135901/is-it-ok-to-use-primary-keys-from-
 https://www.periscopedata.com/blog/better-sql-schema.html
 
 http://rstudio-pubs-static.s3.amazonaws.com/8753_a57d3950027541a590c9b40a045accbf.html#8
+
+http://www.ibm.com/developerworks/data/library/techarticle/dm-1402db2andr/
 -----------------------------------------------------------------------
 
 R project:
@@ -16,4 +18,6 @@ R project:
 Mulea:
 -----------------------------------------------------------------------
 http://www.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29
+
+https://github.com/peterforgacs/GSEA
 -----------------------------------------------------------------------

@@ -1,0 +1,56 @@
+---
+title: "Mulea"
+author: "Cezary Turek"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Mulea}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+THIS IS ONLY TEST OF VIGNETTE. :)
+Mulea is a package to acheave models of ... from our global DB or give you possibility
+to put your own model to your local database. Of course you can push it to global DB.
+Then you can yous alalysis mthods implemented or used in Mulea to count interesting things.
+
+Actually implemented methods (explained in details ... ) are:
+ - GSEA
+ - topGO
+ - clusterprofiler
+
+
+
+## Mulea database workflow
+
+
+### Global Mulea DB
+
+
+### Local Mulea DB
+To start working locally with your own models saved in files you have to create local DB.
+To do it use `createLocalDatabaseSchema()` function. It creates the same schema as on Global DB.
+
+Then you can add model from your file using `addModelToLocalDatabase`. What file formats are supported, it is GMT. All informatin about that format you can find at 
+
+You can remove model from DB by `removeModelFromLocalDatabase()` or update it by putting upper version integer.
+
+You can save model from your local DB by `saveModelFromLocalDatabaseToFile()`
+
+
+
+## Analysis methods
+
+### GSEA
+
+GSEA is Gene Set Enrichment Analisys. 
+
+Using hypergeometric formula to calculate enrichment of certain genes in a differential expression setup.
+
+Hypergeometric GSEA is a simple command line program written in C++ which calculates the hypergeometric probability of different gene sets.
+
+To run that implemantation on data just use `runGSEA()` method.
+
+### topGO
+
+### clusterprofiler
