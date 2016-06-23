@@ -1,7 +1,7 @@
 #: TODO : Type not set fields.
 #: DESCRIPTION uses a simple file format called DCF, the Debian control format.
 #: TODO : Check all licenses of packages which we use in Mulea.
-Package: Mulea
+Package: MulEA
 Type: Package
 Title: What the Package Does (Title Case)
 #: TODO : <major>.<minor>.<patch>.<dev >= 9000>
@@ -19,7 +19,8 @@ License: GPL-2
 LazyData: TRUE
 Imports:
     DBI (>= 0.3.1),
-    RSQLite (>= 1.0.0)
+    RSQLite (>= 1.0.0),
+    topGO (>= 2.25.0)
 Depends:
     R (>= 3.3.0)
 Suggests:

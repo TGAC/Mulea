@@ -5,7 +5,7 @@
 # PUBLIC API
 createLocalDatabaseSchema <- function() {
     driver <- RSQLite::SQLite()
-    db <- DBI::dbConnect(drv = driver, dbname = "./Mulea.sqlite")
+    db <- DBI::dbConnect(drv = driver, dbname = "./MulEA.sqlite")
     DBI::dbBegin(conn = db)
     DBI::dbSendQuery(conn = db, "CREATE TABLE organisms_models (
                    taxonomy_id INTERGER NOT NULL,
@@ -24,8 +24,12 @@ addModelToLocalDatabase <- function(gmtFilePath, taxonomy_id, model_source, vers
                                     scientific_name = 'NULL', common_english_name = 'NULL',
                                     description = 'NULL') {
     # TODO : Inform Eszter that we will use CSV format with GMT.
+#    model <- read.table(file = gmtFilePath, header = FALSE, fill = TRUE,
+#                        stringsAsFactors = FALSE, sep = ",", strip.white = TRUE)
+    maxColLength <- max(count.fields(gmtFilePath, sep = '\t'))
     model <- read.table(file = gmtFilePath, header = FALSE, fill = TRUE,
-                        stringsAsFactors = FALSE, sep = ",", strip.white = TRUE)
+                      stringsAsFactors = FALSE, sep = "\t", strip.white = TRUE
+                      , col.names = paste0("V",seq_len(maxColLength)))
 
     insertEntryToOrganismsModels(taxonomy_id = taxonomy_id, model_source = model_source,
                                  version = version, scientific_name = scientific_name,
@@ -39,7 +43,7 @@ addModelToLocalDatabase <- function(gmtFilePath, taxonomy_id, model_source, vers
 insertEntryToOrganismsModels <- function(taxonomy_id, model_source, version
                                          , scientific_name = 'NULL', common_english_name = 'NULL', description = 'NULL') {
     driver <- RSQLite::SQLite()
-    db <- DBI::dbConnect(drv = driver, dbname = "./Mulea.sqlite")
+    db <- DBI::dbConnect(drv = driver, dbname = "./MulEA.sqlite")
     DBI::dbBegin(conn = db)
 
     scientific_name <- paste("'", scientific_name, "'", sep = "")
@@ -62,7 +66,7 @@ insertEntryToOrganismsModels <- function(taxonomy_id, model_source, version
 
 createModelTable <- function(taxonomy_id, model_source, version) {
     driver <- RSQLite::SQLite()
-    db <- DBI::dbConnect(drv = driver, dbname = "./Mulea.sqlite")
+    db <- DBI::dbConnect(drv = driver, dbname = "./MulEA.sqlite")
     DBI::dbBegin(conn = db)
 
     tableName <- generateModelTableName(taxonomy_id, model_source, version)
@@ -87,7 +91,7 @@ generateModelTableName <- function(taxonomy_id, model_source, version) {
 insertEntriesToModelTable <- function(model, taxonomy_id = taxonomy_id,
                                       model_source = model_source, version = version) {
     driver <- RSQLite::SQLite()
-    db <- DBI::dbConnect(drv = driver, dbname = "./Mulea.sqlite")
+    db <- DBI::dbConnect(drv = driver, dbname = "./MulEA.sqlite")
     DBI::dbBegin(conn = db)
 
     tableName <- generateModelTableName(taxonomy_id, model_source, version)
@@ -95,7 +99,10 @@ insertEntriesToModelTable <- function(model, taxonomy_id = taxonomy_id,
     apply(model, 1, FUN = function(dataFrameRow){
         collection_id <- paste("'", dataFrameRow[1], "'", sep = "")
         collection_name <- paste("'", dataFrameRow[2], "'", sep = "")
-        collection <- paste("'", dataFrameRow[3], "'", sep = "")
+        maxModelLenght <- length(dataFrameRow)
+        collectionValues <- trimws(paste(dataFrameRow[3:maxModelLenght], collapse = "\t"))
+        collection <- paste("'", collectionValues, "'", sep = "")
+
         values <- paste(collection_id, collection_name, collection, sep = ", ")
         query <- paste("INSERT INTO", tableName,
                        "(collection_id, collection_name, collection)",
@@ -110,7 +117,7 @@ insertEntriesToModelTable <- function(model, taxonomy_id = taxonomy_id,
 
 retrieveModelFromLocalDatabase <- function(taxonomy_id, model_source, version) {
     driver <- RSQLite::SQLite()
-    db <- DBI::dbConnect(drv = driver, dbname = "./Mulea.sqlite")
+    db <- DBI::dbConnect(drv = driver, dbname = "./MulEA.sqlite")
     DBI::dbBegin(conn = db)
 
     tableName <- generateModelTableName(taxonomy_id, model_source, version)
@@ -128,14 +135,14 @@ retrieveModelFromLocalDatabase <- function(taxonomy_id, model_source, version) {
 saveModelFromLocalDatabaseToFile <- function(filePath, taxonomy_id, model_source, version) {
     retrievedModel <- retrieveModelFromLocalDatabase(taxonomy_id, model_source, version)
 
-    write.table(file = filePath, x = retrievedModel, sep = ",", quote = FALSE,
+    write.table(file = filePath, x = retrievedModel, sep = "\t", quote = FALSE,
                 row.names = FALSE, col.names = FALSE)
 }
 
 # PUBLIC API
 removeModelFromLocalDatabase <- function(taxonomy_id, model_source, version) {
     driver <- RSQLite::SQLite()
-    db <- DBI::dbConnect(drv = driver, dbname = "./Mulea.sqlite")
+    db <- DBI::dbConnect(drv = driver, dbname = "./MulEA.sqlite")
     DBI::dbBegin(conn = db)
 
     model_source_as_string <- paste("'", model_source, "'", sep = "")

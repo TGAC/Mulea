@@ -7,7 +7,7 @@ devtools::has_devel()
 sessionInfo()
 
 # Build with vignetts.
-devtools::use_vignette(name = "Mulea")
+devtools::use_vignette(name = "MulEA")
 devtools::build_vignettes()
 devtools::build()
 devtools::build(binary = TRUE, args = c('--preclean'))
@@ -53,3 +53,4 @@ find.package("BiocCheck")
 # WORK HELPERS
 # Clean screen.
 cat("\014")
+packageVersion("topGO")

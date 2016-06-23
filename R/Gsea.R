@@ -3,7 +3,7 @@
 # TODO : Different paths on different OSes. Test it!
 # PUBLIC API
 runGSEA <- function(databaseFilePath, populationFilePath, sampleFilePath) {
-    muleaInstallationDirectory <- find.package("Mulea")
+    muleaInstallationDirectory <- find.package("MulEA")
     gseaDirectory <- paste(muleaInstallationDirectory, "/GSEA/", sep = "")
     command <- paste("cd", gseaDirectory, "&&", "./GSEA", databaseFilePath
                      , populationFilePath, sampleFilePath)
