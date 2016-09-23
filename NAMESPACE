@@ -2,7 +2,8 @@
 import(DBI)
 import(RSQLite)
 # Exports:
-export(createLocalDatabaseSchema)
+export(startLocalDatabase)
+export(stopLocalDatabase)
 export(addModelToLocalDatabase)
 export(removeModelFromLocalDatabase)
 export(saveModelFromLocalDatabaseToFile)

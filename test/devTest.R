@@ -26,7 +26,11 @@ bigResultsTabSep <- MulEA::runGSEA(
   , sampleFilePath = "/home/koralgooll/experiments/GSEA/C/GSEA/Database/big_sample.txt")
 
 
-creationOfLocalDB <- MulEA::createLocalDatabaseSchema()
+creationOfLocalDB <- MulEA::startLocalDatabase("/home/koralgooll/doktorat/Rpackages/mulea/")
+creationOfLocalDB <- MulEA::startLocalDatabase(":memory:")
+
+get("databaseLocalization", envir = .GlobalEnv)
+get("databaseConnection", envir = .GlobalEnv)
 
 addToLocalDB20 <- MulEA::addModelToLocalDatabase("/home/koralgooll/doktorat/Rpackages/mulea/Mulea/example/REACTOME_database_dmel_uniq_PROPER.txt",
                                                 taxonomy_id = 9006, model_source = 'File',
@@ -46,7 +50,7 @@ addToLocalDB20 <- MulEA::addModelToLocalDatabase("/home/koralgooll/doktorat/Rpac
 
 removeFromLocalDB1 <- MulEA::removeModelFromLocalDatabase(taxonomy_id = 9016, model_source = 'File', version = 0)
 
-getData <- MulEA::saveModelFromLocalDatabaseToFile(filePath = "/home/koralgooll/doktorat/Rpackages/mulea/Mulea/example/savedModel.txt",
+getData <- MulEA::saveModelFromLocalDatabaseToFile(filePath = "/home/koralgooll/doktorat/Rpackages/mulea/savedModel.txt",
                                                    taxonomy_id = 9006, model_source = 'File', version = 0)
 
 vignette(package = "MulEA")
