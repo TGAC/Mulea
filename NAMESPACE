@@ -2,6 +2,7 @@
 import(DBI)
 import(RSQLite)
 # Exports:
+export(readGmtFileAsDF)
 export(startLocalDatabase)
 export(stopLocalDatabase)
 export(addModelToLocalDatabase)

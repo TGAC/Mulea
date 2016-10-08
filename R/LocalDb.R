@@ -36,13 +36,19 @@ stopLocalDatabase <- function() {
 }
 
 # PUBLIC API
-addModelToLocalDatabase <- function(gmtFilePath, taxonomy_id, model_source, version,
+readGmtFileAsDF <- function(gmtFilePath) {
+    maxColLength <- max(count.fields(gmtFilePath, sep = '\t', quote = "\""))
+    model <- read.table(file = gmtFilePath, header = FALSE, fill = TRUE,
+                        stringsAsFactors = FALSE, sep = "\t", strip.white = TRUE,
+                        col.names = paste0("V",seq_len(maxColLength)), quote = "\"")
+    model
+}
+
+
+# PUBLIC API
+addModelToLocalDatabase <- function(model, taxonomy_id, model_source, version,
                                     scientific_name = 'NULL', common_english_name = 'NULL',
                                     description = 'NULL') {
-    maxColLength <- max(count.fields(gmtFilePath, sep = '\t'))
-    model <- read.table(file = gmtFilePath, header = FALSE, fill = TRUE,
-                      stringsAsFactors = FALSE, sep = "\t", strip.white = TRUE
-                      , col.names = paste0("V",seq_len(maxColLength)))
     db <- get("databaseConnection", envir = .GlobalEnv)
     DBI::dbBegin(conn = db)
     insertEntryToOrganismsModels(taxonomy_id = taxonomy_id, model_source = model_source,
@@ -58,10 +64,10 @@ addModelToLocalDatabase <- function(gmtFilePath, taxonomy_id, model_source, vers
 insertEntryToOrganismsModels <- function(taxonomy_id, model_source, version
                                          , scientific_name = 'NULL', common_english_name = 'NULL', description = 'NULL') {
     db <- get("databaseConnection", envir = .GlobalEnv)
-    scientific_name <- paste("'", scientific_name, "'", sep = "")
-    common_english_name <- paste("'", common_english_name, "'", sep = "")
-    model_source <- paste("'", model_source, "'", sep = "")
-    description <- paste("'", description, "'", sep = "")
+    scientific_name <- paste("\"", scientific_name, "\"", sep = "")
+    common_english_name <- paste("\"", common_english_name, "\"", sep = "")
+    model_source <- paste("\"", model_source, "\"", sep = "")
+    description <- paste("\"", description, "\"", sep = "")
 
     values <- paste(taxonomy_id, scientific_name, common_english_name,
                     model_source, version, description, sep = ", ")
@@ -99,11 +105,11 @@ insertEntriesToModelTable <- function(model, taxonomy_id = taxonomy_id,
     tableName <- generateModelTableName(taxonomy_id, model_source, version)
 
     apply(model, 1, FUN = function(dataFrameRow){
-        collection_id <- paste("'", dataFrameRow[1], "'", sep = "")
-        collection_name <- paste("'", dataFrameRow[2], "'", sep = "")
+        collection_id <- paste("\"", dataFrameRow[1], "\"", sep = "")
+        collection_name <- paste("\"", dataFrameRow[2], "\"", sep = "")
         maxModelLenght <- length(dataFrameRow)
         collectionValues <- trimws(paste(dataFrameRow[3:maxModelLenght], collapse = "\t"))
-        collection <- paste("'", collectionValues, "'", sep = "")
+        collection <- paste("\"", collectionValues, "\"", sep = "")
         values <- paste(collection_id, collection_name, collection, sep = ", ")
         query <- paste("INSERT INTO", tableName,
                        "(collection_id, collection_name, collection)",
@@ -140,7 +146,7 @@ removeModelFromLocalDatabase <- function(taxonomy_id, model_source, version) {
     db <- get("databaseConnection", envir = .GlobalEnv)
     DBI::dbBegin(conn = db)
 
-    model_source_as_string <- paste("'", model_source, "'", sep = "")
+    model_source_as_string <- paste("\"", model_source, "\"", sep = "")
     query1 <- paste("DELETE FROM organisms_models WHERE", "taxonomy_id", "=", taxonomy_id,
                     "AND", "model_source", "=", model_source_as_string,
                     "AND", "version", "=", version, ";", sep = " ")
