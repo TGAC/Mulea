@@ -28,7 +28,7 @@ bigResultsTabSep <- MulEA::runGSEA(
 
 creationOfLocalDB <- MulEA::startLocalDatabase("/home/koralgooll/doktorat/Rpackages/mulea/")
 creationOfLocalDB <- MulEA::startLocalDatabase(":memory:")
-MulEA::stopLocalDatabase()
+stopDbResults <- MulEA::stopLocalDatabase()
 
 get("databaseLocalization", envir = .GlobalEnv)
 get("databaseConnection", envir = .GlobalEnv)
@@ -43,8 +43,13 @@ addToLocalDB20 <- MulEA::addModelToLocalDatabase(model = model,
                                                 version = 0, scientific_name = "real animal",
                                                 description = 'Test on real data')
 
-addToLocalDB20 <- MulEA::addModelToLocalDatabase(model = modelFromEszter,
+addToLocalDB20x <- MulEA::addModelToLocalDatabase(model = model,
                                                  taxonomy_id = 9006, model_source = 'Reactome',
+                                                 version = 0, scientific_name = "some real animal",
+                                                 description = 'Just test case')
+
+addToLocalDB20 <- MulEA::addModelToLocalDatabase(model = modelFromEszter,
+                                                 taxonomy_id = 9001, model_source = 'Reactome',
                                                  version = 0, scientific_name = "some real animal",
                                                  description = 'Just test case')
 

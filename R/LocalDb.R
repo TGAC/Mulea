@@ -15,24 +15,66 @@ startLocalDatabase <- function(muleaDBLocalization = ":memory:") {
     assign("databaseConnection", db, envir = .GlobalEnv)
     assign("databaseLocalization", muleaDBLocalization, envir = .GlobalEnv)
 
-    DBI::dbBegin(conn = db)
-
-    DBI::dbSendQuery(conn = db, "CREATE TABLE IF NOT EXISTS organisms_models (
-                   taxonomy_id INTERGER NOT NULL,
-                   scientific_name TEXT,
-                   common_english_name TEXT,
-                   model_source TEXT NOT NULL,
-                   version INTEGER NOT NULL,
-                   description TEXT,
-                   PRIMARY KEY (taxonomy_id, model_source, version));")
-    DBI::dbCommit(conn = db)
+    DbOperationResult <- tryCatch(
+        {
+            DBI::dbBegin(conn = db)
+            DBI::dbSendQuery(conn = db,
+                "CREATE TABLE IF NOT EXISTS organisms_models (
+                    taxonomy_id INTERGER NOT NULL,
+                    scientific_name TEXT,
+                    common_english_name TEXT,
+                    model_source TEXT NOT NULL,
+                    version INTEGER NOT NULL,
+                    description TEXT,
+                    PRIMARY KEY (taxonomy_id, model_source, version));")
+            DBI::dbCommit(conn = db)
+        },
+        error = function(c) {
+            DBI::dbRollback(conn = db)
+            stop(c)
+            "error"
+        },
+        warning = function(c) {
+            warning(c)
+            "warning"
+        },
+        message = function(c) "message",
+        interrupt = function(c) "interrupt"
+    )
+    DbOperationResult
 }
 
 stopLocalDatabase <- function() {
     db <- get("databaseConnection", envir = .GlobalEnv);
-    DBI::dbDisconnect(conn = db);
-    assign("databaseConnection", NULL, envir = .GlobalEnv)
-    assign("databaseLocalization", NULL, envir = .GlobalEnv)
+    DbOperationResult <- tryCatch(
+        {
+            checkIfDbIsRunning(db)
+            DBI::dbDisconnect(conn = db);
+            assign("databaseConnection", NULL, envir = .GlobalEnv)
+            assign("databaseLocalization", NULL, envir = .GlobalEnv)
+        },
+        error = function(c) {
+            DBI::dbRollback(conn = db)
+            stop(c)
+            "error"
+        },
+        warning = function(c) {
+            warning(c)
+            "warning"
+        },
+        message = function(c) {
+            message(c)
+            "message"
+        },
+        interrupt = function(c) "interrupt"
+    )
+    DbOperationResult
+}
+
+checkIfDbIsRunning <- function(db = NULL) {
+    if (is.null(db)) {
+        message("DB haven't been started yet. Please use MulEA::startLocalDatabase().")
+    }
 }
 
 # PUBLIC API
@@ -50,15 +92,42 @@ addModelToLocalDatabase <- function(model, taxonomy_id, model_source, version,
                                     scientific_name = 'NULL', common_english_name = 'NULL',
                                     description = 'NULL') {
     db <- get("databaseConnection", envir = .GlobalEnv)
-    DBI::dbBegin(conn = db)
-    insertEntryToOrganismsModels(taxonomy_id = taxonomy_id, model_source = model_source,
-                                 version = version, scientific_name = scientific_name,
-                                 common_english_name = common_english_name,
-                                 description = description)
 
-    createModelTable(taxonomy_id = taxonomy_id, model_source = model_source, version = version)
-    insertEntriesToModelTable(model, taxonomy_id = taxonomy_id, model_source = model_source, version = version)
-    DBI::dbCommit(conn = db)
+    DbOperationResult <- tryCatch(
+        {
+            checkIfDbIsRunning(db)
+            DBI::dbBegin(conn = db)
+            insertEntryToOrganismsModels(taxonomy_id = taxonomy_id,
+                                         model_source = model_source,
+                                         version = version,
+                                         scientific_name = scientific_name,
+                                         common_english_name = common_english_name,
+                                         description = description)
+            createModelTable(taxonomy_id = taxonomy_id,
+                             model_source = model_source,
+                             version = version)
+            insertEntriesToModelTable(model,
+                                      taxonomy_id = taxonomy_id,
+                                      model_source = model_source,
+                                      version = version)
+            DBI::dbCommit(conn = db)
+        },
+        error = function(c) {
+            DBI::dbRollback(conn = db)
+            stop(c)
+            "error"
+        },
+        warning = function(c) {
+            warning(c)
+            "warning"
+        },
+        message = function(c) {
+            message(c)
+            "message"
+        },
+        interrupt = function(c) "interrupt"
+    )
+    DbOperationResult
 }
 
 insertEntryToOrganismsModels <- function(taxonomy_id, model_source, version
@@ -121,16 +190,33 @@ insertEntriesToModelTable <- function(model, taxonomy_id = taxonomy_id,
 
 retrieveModelFromLocalDatabase <- function(taxonomy_id, model_source, version) {
     db <- get("databaseConnection", envir = .GlobalEnv)
-    DBI::dbBegin(conn = db)
 
-    tableName <- generateModelTableName(taxonomy_id, model_source, version)
-    query <- paste("SELECT * FROM", tableName, ";", sep = " ")
-
-    queryResults <- DBI::dbGetQuery(conn = db, query)
-
-    DBI::dbCommit(conn = db)
-
-    queryResults
+    DbOperationResult <- tryCatch(
+        {
+            checkIfDbIsRunning(db)
+            DBI::dbBegin(conn = db)
+            tableName <- generateModelTableName(taxonomy_id, model_source, version)
+            query <- paste("SELECT * FROM", tableName, ";", sep = " ")
+            queryResults <- DBI::dbGetQuery(conn = db, query)
+            DBI::dbCommit(conn = db)
+            queryResults
+        },
+        error = function(c) {
+            DBI::dbRollback(conn = db)
+            stop(c)
+            "error"
+        },
+        warning = function(c) {
+            warning(c)
+            "warning"
+        },
+        message = function(c) {
+            message(c)
+            "message"
+        },
+        interrupt = function(c) "interrupt"
+    )
+    DbOperationResult
 }
 
 # PUBLIC API
@@ -144,20 +230,35 @@ saveModelFromLocalDatabaseToFile <- function(filePath, taxonomy_id, model_source
 # PUBLIC API
 removeModelFromLocalDatabase <- function(taxonomy_id, model_source, version) {
     db <- get("databaseConnection", envir = .GlobalEnv)
-    DBI::dbBegin(conn = db)
 
-    model_source_as_string <- paste("\"", model_source, "\"", sep = "")
-    query1 <- paste("DELETE FROM organisms_models WHERE", "taxonomy_id", "=", taxonomy_id,
-                    "AND", "model_source", "=", model_source_as_string,
-                    "AND", "version", "=", version, ";", sep = " ")
-
-    DBI::dbSendQuery(conn = db, query1)
-
-    tableName <- paste('model', taxonomy_id, model_source, version, sep = "_")
-
-    query2 <- paste("DROP TABLE", tableName, ";", sep = " ")
-
-    DBI::dbSendQuery(conn = db, query2)
-
-    DBI::dbCommit(conn = db)
+    DbOperationResult <- tryCatch(
+        {
+            checkIfDbIsRunning(db)
+            DBI::dbBegin(conn = db)
+            model_source_as_string <- paste("\"", model_source, "\"", sep = "")
+            query1 <- paste("DELETE FROM organisms_models WHERE", "taxonomy_id", "=", taxonomy_id,
+                            "AND", "model_source", "=", model_source_as_string,
+                            "AND", "version", "=", version, ";", sep = " ")
+            DBI::dbSendQuery(conn = db, query1)
+            tableName <- paste('model', taxonomy_id, model_source, version, sep = "_")
+            query2 <- paste("DROP TABLE", tableName, ";", sep = " ")
+            DBI::dbSendQuery(conn = db, query2)
+            DBI::dbCommit(conn = db)
+        },
+        error = function(c) {
+            DBI::dbRollback(conn = db)
+            stop(c)
+            "error"
+        },
+        warning = function(c) {
+            warning(c)
+            "warning"
+        },
+        message = function(c) {
+            message(c)
+            "message"
+        },
+        interrupt = function(c) "interrupt"
+    )
+    DbOperationResult
 }
