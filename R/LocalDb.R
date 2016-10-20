@@ -188,7 +188,7 @@ insertEntriesToModelTable <- function(model, taxonomy_id = taxonomy_id,
     })
 }
 
-retrieveModelFromLocalDatabase <- function(taxonomy_id, model_source, version) {
+getModelFromLocalDatabase <- function(taxonomy_id, model_source, version) {
     db <- get("databaseConnection", envir = .GlobalEnv)
 
     DbOperationResult <- tryCatch(
@@ -221,7 +221,7 @@ retrieveModelFromLocalDatabase <- function(taxonomy_id, model_source, version) {
 
 # PUBLIC API
 saveModelFromLocalDatabaseToFile <- function(filePath, taxonomy_id, model_source, version) {
-    retrievedModel <- retrieveModelFromLocalDatabase(taxonomy_id, model_source, version)
+    retrievedModel <- getModelFromLocalDatabase(taxonomy_id, model_source, version)
 
     write.table(file = filePath, x = retrievedModel, sep = "\t", quote = FALSE,
                 row.names = FALSE, col.names = FALSE)
