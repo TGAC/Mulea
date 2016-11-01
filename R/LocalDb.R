@@ -222,9 +222,27 @@ getModelFromLocalDatabase <- function(taxonomy_id, model_source, version) {
 # PUBLIC API
 saveModelFromLocalDatabaseToFile <- function(filePath, taxonomy_id, model_source, version) {
     retrievedModel <- getModelFromLocalDatabase(taxonomy_id, model_source, version)
-
     write.table(file = filePath, x = retrievedModel, sep = "\t", quote = FALSE,
                 row.names = FALSE, col.names = FALSE)
+}
+
+# PUBLIC API
+getModelFromLocalDatabaseAsList <- function(taxonomy_id, model_source, version) {
+    retrievedModel <- getModelFromLocalDatabase(taxonomy_id, model_source, version)
+    retrievedModelList <- as.list(strsplit(retrievedModel$collection, "\t"))
+    names(retrievedModelList) <- as.vector(retrievedModel$collection_id)
+    retrievedModelList
+}
+
+#PUBLIC API
+getModelFromLocalDatabaseAsDf <- function(taxonomy_id, model_source, version) {
+    retrievedModel <- getModelFromLocalDatabase(taxonomy_id, model_source, version)
+    ddply(.data = retrievedModel, .variables = c("collection_id", "collection_name"),
+          .fun = function(dfRow) {
+              collection <- as.character(unlist(strsplit(dfRow[,"collection"], "\t")))
+              modelDf <- data.frame('collection' = I(list(collection)), stringsAsFactors = FALSE)
+              modelDf
+    })
 }
 
 # PUBLIC API

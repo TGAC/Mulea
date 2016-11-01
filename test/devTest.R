@@ -79,6 +79,15 @@ modelFromSave1 <- MulEA::readGmtFileAsDF(gmtFilePath = "testSave1.gmt")
 modelFromSave2 <- MulEA::readGmtFileAsDF(gmtFilePath = "testSave2.gmt")
 modelFromSave3 <- MulEA::readGmtFileAsDF(gmtFilePath = "testSave3.gmt")
 
+
+modeflFromEszterDf <- MulEA::getModelFromLocalDatabaseAsDf(taxonomy_id = 9001,
+                                                           model_source = 'Reactome',
+                                                           version = 0)
+myDataFromExperiment <- c("FBgn0004407", "FBgn0010438", "FBgn0003742", "FBgn0029709", "FBgn0030341", "FBgn0037044", "FBgn0002887")
+
+hTestResults <- MulEA::calculateHypergeometricTest(model = modeflFromEszterDf,
+                                                   sampleVector = myDataFromExperiment)
+
 vignette(package = "MulEA")
 vignette("MulEA")
 

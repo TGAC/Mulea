@@ -20,7 +20,8 @@ LazyData: TRUE
 Imports:
     DBI (>= 0.3.1),
     RSQLite (>= 1.0.0),
-    topGO (>= 2.25.0)
+    topGO (>= 2.25.0),
+    plyr (>= 1.8.4)
 Depends:
     R (>= 3.3.0)
 Suggests:
@@ -32,6 +33,7 @@ Collate:
     'Mulea.R'
     'LocalDb.R'
     'Gsea.R'
+    'Methods.R'
 URL: http://yihui.name/knitr/
 BugReports: https://github.com/yihui/knitr/issues
 #: Descripe package in BioConductor structure
