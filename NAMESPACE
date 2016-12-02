@@ -1,6 +1,7 @@
 # Imports:
 import(DBI)
 import(RSQLite)
+import(plyr)
 # Exports:
 export(readGmtFileAsDF)
 export(startLocalDatabase)
@@ -13,3 +14,5 @@ export(getModelFromLocalDatabaseAsDf)
 export(saveModelFromLocalDatabaseToFile)
 export(runGSEA)
 export(calculateHypergeometricTest)
+export(calculateFisherTest)
+export(calculateChiSquaredTest)

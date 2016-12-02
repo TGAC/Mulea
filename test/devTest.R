@@ -87,6 +87,10 @@ myDataFromExperiment <- c("FBgn0004407", "FBgn0010438", "FBgn0003742", "FBgn0029
 
 hTestResults <- MulEA::calculateHypergeometricTest(model = modeflFromEszterDf,
                                                    sampleVector = myDataFromExperiment)
+fTestResults <- MulEA::calculateFisherTest(model = modeflFromEszterDf,
+                                           sampleVector = myDataFromExperiment)
+chTestResults <- MulEA::calculateChiSquaredTest(model = modeflFromEszterDf,
+                                                sampleVector = myDataFromExperiment)
 
 vignette(package = "MulEA")
 vignette("MulEA")
