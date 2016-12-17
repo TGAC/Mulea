@@ -79,6 +79,25 @@ checkIfDbIsRunning <- function(db = NULL) {
 
 # PUBLIC API
 readGmtFileAsDF <- function(gmtFilePath) {
+    fileConnection <- file(gmtFilePath)
+    lines <- readLines(fileConnection)
+    close(fileConnection)
+    gmtAsDF <- plyr::adply(.data = lines, .margins = 1, .fun = function(line) {
+        fields <- strsplit(line, split = "\t")[[1]]
+        category <- fields[1]
+        if (startsWith(fields[2], "\"") && endsWith(fields[2], "\"")) {
+          description <- fields[2]
+        } else {
+          description <- paste("\"", fields[2], "\"", sep = "")
+        }
+        listOfValues <- fields[3:length(fields)]
+        data.frame('category' = category, 'description' = description, 'listOfValues' = I(list(listOfValues)), stringsAsFactors = FALSE)
+    })
+    gmtAsDF[c("category", "description", "listOfValues")]
+}
+
+#TODO : Is that hepler needed?
+readGmtFileAsPlaneDF <- function(gmtFilePath) {
     maxColLength <- max(count.fields(gmtFilePath, sep = '\t', quote = "\""))
     model <- read.table(file = gmtFilePath, header = FALSE, fill = TRUE,
                         stringsAsFactors = FALSE, sep = "\t", strip.white = TRUE,
@@ -152,10 +171,10 @@ createModelTable <- function(taxonomy_id, model_source, version) {
     db <- get("databaseConnection", envir = .GlobalEnv)
 
     tableName <- generateModelTableName(taxonomy_id, model_source, version)
-    tableDefinition <- "(collection_id TEXT NOT NULL,
-                         collection_name TEXT,
-                         collection TEXT,
-                         PRIMARY KEY (collection_id));"
+    tableDefinition <- "(category TEXT NOT NULL,
+                         description  TEXT,
+                         listOfValues TEXT,
+                         PRIMARY KEY (category));"
 
     query <- paste("CREATE TABLE", tableName, tableDefinition, sep = " ")
     print(query)
@@ -168,24 +187,23 @@ generateModelTableName <- function(taxonomy_id, model_source, version) {
 }
 
 insertEntriesToModelTable <- function(model, taxonomy_id = taxonomy_id,
-                                      model_source = model_source, version = version) {
-    db <- get("databaseConnection", envir = .GlobalEnv)
+                                         model_source = model_source, version = version) {
+  db <- get("databaseConnection", envir = .GlobalEnv)
 
-    tableName <- generateModelTableName(taxonomy_id, model_source, version)
+  tableName <- generateModelTableName(taxonomy_id, model_source, version)
 
-    apply(model, 1, FUN = function(dataFrameRow){
-        collection_id <- paste("\"", dataFrameRow[1], "\"", sep = "")
-        collection_name <- paste("\"", dataFrameRow[2], "\"", sep = "")
-        maxModelLenght <- length(dataFrameRow)
-        collectionValues <- trimws(paste(dataFrameRow[3:maxModelLenght], collapse = "\t"))
-        collection <- paste("\"", collectionValues, "\"", sep = "")
-        values <- paste(collection_id, collection_name, collection, sep = ", ")
-        query <- paste("INSERT INTO", tableName,
-                       "(collection_id, collection_name, collection)",
-                       "VALUES (", values, ");", sep = " ")
-        print(query)
-        DBI::dbSendQuery(conn = db, query)
-    })
+  apply(model, 1, FUN = function(dataFrameRow){
+    category <- paste("\"", dataFrameRow$category, "\"", sep = "")
+    description <- dataFrameRow$description
+    listOfValuesCollapsed <- trimws(paste(dataFrameRow$listOfValues, collapse = "\t"))
+    listOfValuesCollapsedEscaped <- paste("\"", listOfValuesCollapsed, "\"", sep = "")
+    listOfValues <- paste(category, description, listOfValuesCollapsedEscaped, sep = ", ")
+    query <- paste("INSERT INTO", tableName,
+                   "(category, description, listOfValues)",
+                   "VALUES (", listOfValues, ");", sep = " ")
+    print(query)
+    DBI::dbSendQuery(conn = db, query)
+  })
 }
 
 getModelFromLocalDatabase <- function(taxonomy_id, model_source, version) {
@@ -220,27 +238,40 @@ getModelFromLocalDatabase <- function(taxonomy_id, model_source, version) {
 }
 
 # PUBLIC API
-saveModelFromLocalDatabaseToFile <- function(filePath, taxonomy_id, model_source, version) {
-    retrievedModel <- getModelFromLocalDatabase(taxonomy_id, model_source, version)
-    write.table(file = filePath, x = retrievedModel, sep = "\t", quote = FALSE,
-                row.names = FALSE, col.names = FALSE)
+saveModelFromLocalDatabaseToFile <- function(taxonomy_id, model_source, version, gmtFilePath) {
+    modelDfFromLocalDB <- getModelFromLocalDatabaseAsDf(taxonomy_id = 9001, model_source = "GO", version = 0)
+    saveModelFromDataFrameToGmtFile(modelDF = modelDfFromLocalDB, gmtFilePath = gmtFilePath)
+    #retrievedModel <- getModelFromLocalDatabase(taxonomy_id, model_source, version)
+    #write.table(file = gmtFilePath, x = retrievedModel, sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
+}
+
+saveModelFromDataFrameToGmtFile <- function(modelDF, gmtFilePath) {
+    vectorOfModel <- plyr::daply(.data = modelDF, .variables = c("category"), .fun = function(dataFrameRow){
+        collapsedListOfValues <- paste(dataFrameRow[,3][[1]], collapse = "\t")
+        paste(dataFrameRow[1], dataFrameRow[2], collapsedListOfValues, sep = "\t")
+    })
+    fileConnection <- file(gmtFilePath)
+    writeLines(vectorOfModel, con = fileConnection, sep = "\n", useBytes = FALSE)
+    close(fileConnection)
 }
 
 # PUBLIC API
 getModelFromLocalDatabaseAsList <- function(taxonomy_id, model_source, version) {
     retrievedModel <- getModelFromLocalDatabase(taxonomy_id, model_source, version)
-    retrievedModelList <- as.list(strsplit(retrievedModel$collection, "\t"))
-    names(retrievedModelList) <- as.vector(retrievedModel$collection_id)
+    retrievedModelList <- as.list(strsplit(retrievedModel$listOfValues, "\t"))
+    names(retrievedModelList) <- as.vector(retrievedModel$category)
     retrievedModelList
 }
 
 #PUBLIC API
 getModelFromLocalDatabaseAsDf <- function(taxonomy_id, model_source, version) {
     retrievedModel <- getModelFromLocalDatabase(taxonomy_id, model_source, version)
-    ddply(.data = retrievedModel, .variables = c("collection_id", "collection_name"),
+    ddply(.data = retrievedModel, .variables = c("category"),
           .fun = function(dfRow) {
-              collection <- as.character(unlist(strsplit(dfRow[,"collection"], "\t")))
-              modelDf <- data.frame('collection' = I(list(collection)), stringsAsFactors = FALSE)
+              description <- paste("\"", dfRow[,"description"], "\"", sep = "")
+              listOfValues <- as.character(unlist(strsplit(dfRow[,"listOfValues"], "\t")))
+              modelDf <- data.frame('description' = description,
+                                    'listOfValues' = I(list(listOfValues)), stringsAsFactors = FALSE)
               modelDf
     })
 }

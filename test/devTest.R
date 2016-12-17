@@ -28,6 +28,7 @@ bigResultsTabSep <- MulEA::runGSEA(
 
 creationOfLocalDB <- MulEA::startLocalDatabase("/home/koralgooll/doktorat/Rpackages/mulea/")
 creationOfLocalDB <- MulEA::startLocalDatabase(":memory:")
+#I case of corrupted data - DB is broken.
 stopDbResults <- MulEA::stopLocalDatabase()
 
 get("databaseLocalization", envir = .GlobalEnv)
@@ -43,7 +44,7 @@ addToLocalDB20 <- MulEA::addModelToLocalDatabase(model = model,
                                                 version = 0, scientific_name = "real animal",
                                                 description = 'Test on real data')
 
-addToLocalDB20x <- MulEA::addModelToLocalDatabase(model = model,
+addToLocalDB20x <- MulEA::addModelToLocalDatabase(model = modelFromEszter,
                                                  taxonomy_id = 9006, model_source = 'Reactome',
                                                  version = 0, scientific_name = "some real animal",
                                                  description = 'Just test case')
@@ -69,6 +70,12 @@ removeFromLocalDB1 <- MulEA::removeModelFromLocalDatabase(taxonomy_id = 9016, mo
 
 getData1 <- MulEA::saveModelFromLocalDatabaseToFile(filePath = "testSave1.gmt",
                                                    taxonomy_id = 9006, model_source = 'Reactome', version = 0)
+dfFromDB1 <- MulEA::getModelFromLocalDatabaseAsDf(taxonomy_id = 9006, model_source = 'Reactome', version = 0)
+cosFromDB1 <- MulEA::getModelFromLocalDatabase(taxonomy_id = 9006, model_source = 'Reactome', version = 0)
+
+
+getDataX <- MulEA::saveModelFromLocalDatabaseToFile(filePath = "smallTest.gmt",
+                                                    taxonomy_id = 1000, model_source = 'GSEA', version = 0)
 getData2 <- MulEA::saveModelFromLocalDatabaseToFile(filePath = "testSave2.gmt",
                                                    taxonomy_id = 9016, model_source = 'File', version = 0)
 getData3 <- MulEA::saveModelFromLocalDatabaseToFile(filePath = "testSave3.gmt",
@@ -84,6 +91,20 @@ modeflFromEszterDf <- MulEA::getModelFromLocalDatabaseAsDf(taxonomy_id = 9001,
                                                            model_source = 'Reactome',
                                                            version = 0)
 myDataFromExperiment <- c("FBgn0004407", "FBgn0010438", "FBgn0003742", "FBgn0029709", "FBgn0030341", "FBgn0037044", "FBgn0002887")
+
+smallResultsTabSep <- MulEA::runGSEA(
+  databaseFilePath = ""
+  , populationFilePath = "/home/koralgooll/experiments/GSEA/C/GSEA/Database/small_pool.txt"
+  , sampleFilePath = "/home/koralgooll/experiments/GSEA/C/GSEA/Database/small_sample.txt")
+
+smallGseaModelDF <- MulEA::readGmtFileAsDF(gmtFilePath = "/home/koralgooll/experiments/GSEA/C/GSEA/Database/small_db_tab_sep.txt")
+
+MulEA::addModelToLocalDatabase(model = smallGseaModelDF, taxonomy_id = 1000, model_source = 'GSEA', version = 0)
+MulEA::removeModelFromLocalDatabase(taxonomy_id = 1000, model_source = 'GSEA', version = 0)
+
+gseaModelFromDBasDF <- MulEA::getModelFromLocalDatabaseAsDf(taxonomy_id = 1000, model_source = 'GSEA', version = 0)
+
+gTestResults <- MulEA::calculateGSEATest(model = gseaModelFromDBasDF, sampleVector = c("1","2","3"), modelBaseVector = character(0))
 
 hTestResults <- MulEA::calculateHypergeometricTest(model = modeflFromEszterDf,
                                                    sampleVector = myDataFromExperiment)
