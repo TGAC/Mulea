@@ -68,17 +68,17 @@ addToLocalDB20 <- MulEA::addModelToLocalDatabase(model = model3FromEszter,
 removeFromLocalDB1 <- MulEA::removeModelFromLocalDatabase(taxonomy_id = 9006, model_source = 'Reactome', version = 0)
 removeFromLocalDB1 <- MulEA::removeModelFromLocalDatabase(taxonomy_id = 9016, model_source = 'File', version = 0)
 
-getData1 <- MulEA::saveModelFromLocalDatabaseToFile(filePath = "testSave1.gmt",
+getData1 <- MulEA::saveModelFromLocalDatabaseToFile(gmtFilePath = "testSave1.gmt",
                                                    taxonomy_id = 9006, model_source = 'Reactome', version = 0)
 dfFromDB1 <- MulEA::getModelFromLocalDatabaseAsDf(taxonomy_id = 9006, model_source = 'Reactome', version = 0)
 cosFromDB1 <- MulEA::getModelFromLocalDatabase(taxonomy_id = 9006, model_source = 'Reactome', version = 0)
 
 
-getDataX <- MulEA::saveModelFromLocalDatabaseToFile(filePath = "smallTest.gmt",
+getDataX <- MulEA::saveModelFromLocalDatabaseToFile(gmtFilePath = "smallTest.gmt",
                                                     taxonomy_id = 1000, model_source = 'GSEA', version = 0)
-getData2 <- MulEA::saveModelFromLocalDatabaseToFile(filePath = "testSave2.gmt",
+getData2 <- MulEA::saveModelFromLocalDatabaseToFile(gmtFilePath = "testSave2.gmt",
                                                    taxonomy_id = 9016, model_source = 'File', version = 0)
-getData3 <- MulEA::saveModelFromLocalDatabaseToFile(filePath = "testSave3.gmt",
+getData3 <- MulEA::saveModelFromLocalDatabaseToFile(gmtFilePath = "testSave3.gmt",
                                                    taxonomy_id = 9006, model_source = 'GO', version = 0)
 
 

@@ -1,6 +1,6 @@
-calculateHypergeometricTest <- function(model, sampleVector) {
+calculateHypergeometricTest <- function(model, sampleVector, adjustMethod = NA) {
     allElements <- unique(unlist(model$listOfValues))
-    ddply(.data = model,  .variables = c("category"), .fun = function(dfRow) {
+    testResults <- ddply(.data = model,  .variables = c("category"), .fun = function(dfRow) {
         modelSampleIntersection <- intersect(dfRow[1, 'listOfValues'][[1]], sampleVector)
         q <- length(modelSampleIntersection)
         m <- length(dfRow[1, 'listOfValues'][[1]])
@@ -16,12 +16,16 @@ calculateHypergeometricTest <- function(model, sampleVector) {
             'k' = k,
             'p-value' = phyper(q, m, n, k, lower.tail = FALSE, log.p = FALSE))
     })
+    if (!is.na(adjustMethod)) {
+      testResults <- data.frame(testResults, "controllingProcedures" = p.adjust(testResults$p.value, method = adjustMethod))
+    }
+    testResults
 }
 
-calculateTestOnContingencyTable <- function(testMethod, testResultsColumnName) {
-  function(model, sampleVector) {
+calculateTestOnContingencyTable <- function(testMethod) {
+  function(model, sampleVector, adjustMethod = NA) {
     allElements <- unique(unlist(model$listOfValues))
-    ddply(.data = model,  .variables = c("category"), .fun = function(dfRow) {
+    testResults <- ddply(.data = model,  .variables = c("category"), .fun = function(dfRow) {
       modelSampleIntersection <- intersect(dfRow[1, 'listOfValues'][[1]], sampleVector)
       q <- length(modelSampleIntersection)
       m <- length(dfRow[1, 'listOfValues'][[1]])
@@ -35,14 +39,24 @@ calculateTestOnContingencyTable <- function(testMethod, testResultsColumnName) {
         'm' = m,
         'n' = n,
         'k' = k,
-        testResultsColumnName = I(list(testMethod(matrix(c(m, q, n, k), nrow = 2)))))
+        'testResultsColumnName' = I(list(testMethod(matrix(c(m, q, n, k), nrow = 2)))))
     })
+    if (!is.na(adjustMethod)) {
+      testResults <- data.frame(testResults,
+                                "controllingProcedures" = p.adjust(
+                                    plyr::laply(.data = testResults$testResultsColumnName,
+                                                .fun = function(list) {
+                                                    list$p.value
+                                                }),
+                                    method = adjustMethod))
+    }
+    testResults
   }
 }
 
-calculateFisherTest <- calculateTestOnContingencyTable(fisher.test, testResultsColumnName = 'fisherTestResults')
+calculateFisherTest <- calculateTestOnContingencyTable(fisher.test)
 
-calculateChiSquaredTest <- calculateTestOnContingencyTable(chisq.test, testResultsColumnName = 'chiSquaredTestResults')
+calculateChiSquaredTest <- calculateTestOnContingencyTable(chisq.test)
 
 calculateGSEATest <- function(model, sampleVector, modelBaseVector) {
     modelTmpGmtFile <- tempfile(pattern = "file", tmpdir = tempdir(), fileext = ".gmt")

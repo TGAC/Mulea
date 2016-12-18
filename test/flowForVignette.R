@@ -35,3 +35,7 @@ hTestResults <- MulEA::calculateHypergeometricTest(model = modelDfFromLocalDB, s
 fTestResults <- MulEA::calculateFisherTest(model = modelDfFromFile, sampleVector = dataFromExperiment)
 chTestResults <- MulEA::calculateChiSquaredTest(model = modelDfFromLocalDB, sampleVector = dataFromExperiment)
 
+#Adjust P-values for Multiple Comparisons.
+hTestResultsWithAdjustment <- MulEA::calculateHypergeometricTest(model = modelDfFromLocalDB, sampleVector = dataFromExperiment, adjustMethod = "BH")
+fTestResultsWithAdjustment <- MulEA::calculateFisherTest(model = modelDfFromFile, sampleVector = dataFromExperiment, adjustMethod = "bonferroni")
+chTestResultsWithAdjustment <- MulEA::calculateChiSquaredTest(model = modelDfFromLocalDB, sampleVector = dataFromExperiment, adjustMethod = "BY")
