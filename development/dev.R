@@ -1,6 +1,6 @@
 # Packages development.
 install.packages(c("devtools", "roxygen2", "testthat", "knitr", "rmarkdown"))
-devtools::install_github("hadley/devtools")
+devtools::install_github("hadley/devtools", force = TRUE)
 install.packages("rstudioapi")
 library(devtools)
 devtools::has_devel()
@@ -8,8 +8,10 @@ sessionInfo()
 
 # Build with vignetts.
 devtools::use_vignette(name = "MulEA")
+devtools::use_vignette(name = "test")
 devtools::build_vignettes()
-devtools::build()
+vignette("test")
+devtools::use_vignette(name = "MulEA")devtools::build() #Make error - use build and reload from Rstudio.
 devtools::build(binary = TRUE, args = c('--preclean'))
 devtools::install()
 # Source package is supported on Linux.
@@ -18,7 +20,7 @@ install.packages("/home/koralgooll/doktorat/Rpackages/mulea/Mulea_0.99.0.tar.gz"
 # Binary is supported only on Windows and OS X.
 install.packages("/home/koralgooll/doktorat/Rpackages/mulea/Mulea_0.99.0_R_x86_64-pc-linux-gnu.tar.gz"
                   , repos = NULL, type = "binary")
-vignette("Mulea")
+vignette("MulEA")
 #
 
 # Mulea uses.

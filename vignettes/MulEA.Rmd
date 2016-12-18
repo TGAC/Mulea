@@ -1,6 +1,6 @@
 ---
 title: "MulEA"
-author: "Cezary Turek"
+author: "Wiktor Jurkowski, Eszter Ari, David Fazekas, Cezary Turek"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -9,26 +9,61 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r global_options, include=TRUE, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, error = TRUE)
+```
+
 THIS IS VIGNETTE in time of development. :)
+
 Mulea is a package to acheave models of ... from our global DB or give you possibility
 to put your own model to your local database. Of course you can push it to global DB.
 Then you can use implemented mthods to alalysis data.
 
-Actually implemented methods (explained in details ... ) are:
- - GSEA (partially implemented)
- - topGO (not implemented yet)
- - clusterprofiler (not implemented yet)
+Actually implemented features (explained in details ... ) are:
+
+- [Mulea Database Workflow](#mulea-database-workflow)
+    - [File](#file)
+    - [Local Mulea DB](#local-mulea-db)
+    - [Global Mulea DB](#global-mulea-db)
+- [Data Analysis](#data-analysis)
+    - [Analysis Methods](#analysis-methods)
+        - [GSEA](#gsea)
+        - [Hypergeometric Test](#hypergeometric-test)
+        - [Fisher Test](#fisher-test)
+        - [Chi Squared Test](#chi-squared-test)
+        - [Kolmogorov Smirnov Test](#kolmogorov-smirnov-test)
+    - [Extra Operations](#extra-operations)
+        - [Multiple Comparisons Problem](#multiple-comparisons-problem)
+- [Other](#other)
 
 
 
-## Mulea database workflow
+## Mulea Database Workflow
+We have 3 ways of working with data in MulEA package. You can work directly from our global DB, you can work with your local DB or with files. Below you can find detailed instructions.
 
+### File
+File which includes model need to be in GMT: Gene Matrix Transposed file format (*.gmt) ([format explanation](http://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29)). You can find example of that file under MulEA installation directory in example folder. To find installation directory use find.package("MulEA") command.
 
-### Global Mulea DB
-(Not implemented yet.)
+To read GMT file as dataframe use this methos please: `MulEA::readGmtFileAsDF()`. Method accepts one required (*) argument `gmtFilePath`.
+
+- `gmtFilePath` - It is path to file, which include model. Example: `"R/MulEA/example/model.gmt"`
+
+Model is read into the data frame which looks like that:
+
+```{r, results = 'asis'} 
+pathToModelGmtFile <- paste(find.package("MulEA"),"/example/model.gmt", sep = "")
+modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = pathToModelGmtFile)
+knitr::kable(modelDfFromFile, caption = "Model Data Frame")
+```
 
 ### Local Mulea DB
-To start working locally with your own models saved in files you have to create local DB. To do it use `MulEA::createLocalDatabaseSchema()` function. It creates the same schema as on Global DB, but locally on your computer. To see how database look like please install add-on to Mozilla Firefox https://addons.mozilla.org/en-US/firefox/addon/sqlite-manager/ and then go to url chrome://sqlitemanager/content/sqlitemanager.xul choose from main menu Database > Connect Database, then choose file MulEA.sqlite. It should be in working directory `getwd()`, in my case it is [1] "/home/koralgooll/doktorat/Rpackages/mulea/Mulea".
+With MulEA you can have all your models (models from files, global DB etc.) in one place. This place is local DB. This open for you an easy way to control, share and work with all your models. Before storing or downloading models thare you need to run database. To do it please use `MulEA::startLocalDatabase()`, this method creates the same schema as on Global DB, but locally on your computer. If schema has been already created it reads database. This method also has one argument:
+
+- `muleaDBLocalization` - By default its value is `":memory:"` which means that DB is created in memory of computer. If you want to have file which represents you database, for example for sharing it, you should put a directory when SQLite file should be created. Example: `"/home/muleaDB/"`. File with name `MulEA.sqlite` will be created there.
+
+To see how database look like please install add-on to Mozilla Firefox https://addons.mozilla.org/en-US/firefox/addon/sqlite-manager/ and then go to url chrome://sqlitemanager/content/sqlitemanager.xul choose from main menu Database > Connect Database, then choose file MulEA.sqlite.
+
+It is good practise to close database connection after you finish work with MulEA. To do it type that command: `MulEA::stopLocalDatabase()`.
 
 Then you can add models from your files using `MulEA::addModelToLocalDatabase()` function. In my case usage of function look like that: `MulEA::addModelToLocalDatabase("/home/koralgooll/doktorat/Rpackages/mulea/Mulea/example/REACTOME_database_dmel_uniq_PROPER.txt", taxonomy_id = 9006, model_source = 'File', version = 0, scientific_name = "realanimal", description = 'Test on real data')`. 
 
@@ -47,10 +82,15 @@ You can remove model from DB by `MulEA::removeModelFromLocalDatabase(taxonomy_id
 
 You can save model from your local DB to file by `MulEA::saveModelFromLocalDatabaseToFile(filePath = "/home/koralgooll/doktorat/Rpackages/mulea/Mulea/example/savedModel.txt", taxonomy_id = 9006, model_source = 'File', version = 0)`
 
+### Global Mulea DB
+(Not implemented yet.)
 
-## Analysis methods
 
-### GSEA
+## Data Analysis
+
+### Analysis Methods
+
+#### GSEA
 
 GSEA is Gene Set Enrichment Analisys. 
 
@@ -78,11 +118,22 @@ small_db.txt
 category1 1 2	3	4  
 category2	5	6	7	8  
 
-### topGO
+#### Hypergeometric Test
 
 Not implemented yet.
 
-### clusterprofiler
+#### Fisher Test
 
 Not implemented yet.
 
+#### Chi Squared Test
+
+TODO
+
+#### Kolmogorov Smirnov Test
+
+### Extra Operations
+
+#### Multiple Comparisons Problem
+
+## Other
