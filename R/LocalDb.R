@@ -18,7 +18,7 @@ startLocalDatabase <- function(muleaDBLocalization = ":memory:") {
     DbOperationResult <- tryCatch(
         {
             DBI::dbBegin(conn = db)
-            DBI::dbSendQuery(conn = db,
+            DBI::dbGetQuery(conn = db,
                 "CREATE TABLE IF NOT EXISTS organisms_models (
                     taxonomy_id INTERGER NOT NULL,
                     scientific_name TEXT,
@@ -75,34 +75,6 @@ checkIfDbIsRunning <- function(db = NULL) {
     if (is.null(db)) {
         message("DB haven't been started yet. Please use MulEA::startLocalDatabase().")
     }
-}
-
-# PUBLIC API
-readGmtFileAsDF <- function(gmtFilePath) {
-    fileConnection <- file(gmtFilePath)
-    lines <- readLines(fileConnection)
-    close(fileConnection)
-    gmtAsDF <- plyr::adply(.data = lines, .margins = 1, .fun = function(line) {
-        fields <- strsplit(line, split = "\t")[[1]]
-        category <- fields[1]
-        if (startsWith(fields[2], "\"") && endsWith(fields[2], "\"")) {
-          description <- fields[2]
-        } else {
-          description <- paste("\"", fields[2], "\"", sep = "")
-        }
-        listOfValues <- fields[3:length(fields)]
-        data.frame('category' = category, 'description' = description, 'listOfValues' = I(list(listOfValues)), stringsAsFactors = FALSE)
-    })
-    gmtAsDF[c("category", "description", "listOfValues")]
-}
-
-#TODO : Is that hepler needed?
-readGmtFileAsPlaneDF <- function(gmtFilePath) {
-    maxColLength <- max(count.fields(gmtFilePath, sep = '\t', quote = "\""))
-    model <- read.table(file = gmtFilePath, header = FALSE, fill = TRUE,
-                        stringsAsFactors = FALSE, sep = "\t", strip.white = TRUE,
-                        col.names = paste0("V",seq_len(maxColLength)), quote = "\"")
-    model
 }
 
 
@@ -164,7 +136,7 @@ insertEntryToOrganismsModels <- function(taxonomy_id, model_source, version
                    "(taxonomy_id, scientific_name, common_english_name, model_source, version, description)",
                    "VALUES (", values, ");", sep = " ")
     print(query)
-    DBI::dbSendQuery(conn = db, query)
+    DBI::dbGetQuery(conn = db, query)
 }
 
 createModelTable <- function(taxonomy_id, model_source, version) {
@@ -178,7 +150,7 @@ createModelTable <- function(taxonomy_id, model_source, version) {
 
     query <- paste("CREATE TABLE", tableName, tableDefinition, sep = " ")
     print(query)
-    DBI::dbSendQuery(conn = db, query)
+    DBI::dbGetQuery(conn = db, query)
 }
 
 generateModelTableName <- function(taxonomy_id, model_source, version) {
@@ -202,7 +174,7 @@ insertEntriesToModelTable <- function(model, taxonomy_id = taxonomy_id,
                    "(category, description, listOfValues)",
                    "VALUES (", listOfValues, ");", sep = " ")
     print(query)
-    DBI::dbSendQuery(conn = db, query)
+    DBI::dbGetQuery(conn = db, query)
   })
 }
 
@@ -245,16 +217,6 @@ saveModelFromLocalDatabaseToFile <- function(taxonomy_id, model_source, version,
     #write.table(file = gmtFilePath, x = retrievedModel, sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 }
 
-saveModelFromDataFrameToGmtFile <- function(modelDF, gmtFilePath) {
-    vectorOfModel <- plyr::daply(.data = modelDF, .variables = c("category"), .fun = function(dataFrameRow){
-        collapsedListOfValues <- paste(dataFrameRow[,3][[1]], collapse = "\t")
-        paste(dataFrameRow[1], dataFrameRow[2], collapsedListOfValues, sep = "\t")
-    })
-    fileConnection <- file(gmtFilePath)
-    writeLines(vectorOfModel, con = fileConnection, sep = "\n", useBytes = FALSE)
-    close(fileConnection)
-}
-
 # PUBLIC API
 getModelFromLocalDatabaseAsList <- function(taxonomy_id, model_source, version) {
     retrievedModel <- getModelFromLocalDatabase(taxonomy_id, model_source, version)
@@ -288,10 +250,10 @@ removeModelFromLocalDatabase <- function(taxonomy_id, model_source, version) {
             query1 <- paste("DELETE FROM organisms_models WHERE", "taxonomy_id", "=", taxonomy_id,
                             "AND", "model_source", "=", model_source_as_string,
                             "AND", "version", "=", version, ";", sep = " ")
-            DBI::dbSendQuery(conn = db, query1)
+            DBI::dbGetQuery(conn = db, query1)
             tableName <- paste('model', taxonomy_id, model_source, version, sep = "_")
             query2 <- paste("DROP TABLE", tableName, ";", sep = " ")
-            DBI::dbSendQuery(conn = db, query2)
+            DBI::dbGetQuery(conn = db, query2)
             DBI::dbCommit(conn = db)
         },
         error = function(c) {
