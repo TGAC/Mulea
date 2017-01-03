@@ -15,9 +15,7 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, error = TR
 
 THIS IS VIGNETTE in time of development. :)
 
-Mulea is a package to acheave models of ... from our global DB or give you possibility
-to put your own model to your local database. Of course you can push it to global DB.
-Then you can use implemented mthods to alalysis data.
+MulEA (Multi Enrichment Analysis) is a package/tool for functional interpretation and integration of multi-omics data sets. It can work with ontologies as GO, ... 
 
 Actually implemented features (explained in details ... ) are:
 
@@ -36,6 +34,8 @@ Actually implemented features (explained in details ... ) are:
         - [Graph Base](#graph-base)
     - [Extra Operations](#extra-operations)
         - [Multiple Comparisons Problem](#multiple-comparisons-problem)
+            - [GSEA](#gsea)
+            - [General Approach](#general-approach)
 - [Code Snippet](#code-snippet)
 - [Other](#other)
 
@@ -179,11 +179,72 @@ chiSquaredTest[4,]$testResultsColumnName[[1]]
 
 
 #### Multiple Comparisons Problem
+
+
+##### GSEA
 (not implemented yet)
+
+
+##### General Approach
+According to article [Multiple Comparisons Problem](https://en.wikipedia.org/wiki/Multiple_comparisons_problem) you can adjust p-values of tested models by adding `adjustMethod` argument to contyngency table based tests methods. Value of this argument is one of listed values: "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr". You can find references to the method under this [link](http://stat.ethz.ch/R-manual/R-devel/library/stats/html/p.adjust.html).
+
+Data frame with adjustment of p-values has one extra column. You can see that column in below model:
+
+```{r, results = 'asis'} 
+hypergeometricTestWithAdjustment <- MulEA::calculateHypergeometricTest(model = modelDfFromFile, sampleVector = experimentalData, adjustMethod = "BH")
+knitr::kable(hypergeometricTestWithAdjustment, caption = "Hypergeometric Test Result With Adjustment Data Frame")
+```
 
 
 ## Code Snippet
-(not implemented yet)
+You can copy paste this code to start working with MulEA more easely. All Snippet of the code regarding to some capture of this vignettes:
+
+[Reading GMT File](#file).
+
+`
+pathToModelGmtFile <- paste(find.package("MulEA"),"/example/model.gmt", sep = "")
+modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = pathToModelGmtFile)
+knitr::kable(modelDfFromFile, caption = "Model Data Frame")
+`
+
+[SQLite DB on local machine](#local-mulea-db).
+
+`
+creationOfLocalDB <- MulEA::startLocalDatabase("/home/koralgooll/doktorat/Rpackages/mulea/")
+creationOfLocalDB <- MulEA::startLocalDatabase(":memory:")
+`
+
+`
+stopDbResults <- MulEA::stopLocalDatabase()
+`
+
+`
+MulEA::addModelToLocalDatabase(model = modelDfFromFile, taxonomy_id = 9001, model_source = "GO", version = 0)
+modelDfFromLocalDB <- MulEA::getModelFromLocalDatabaseAsDf(taxonomy_id = 9001, model_source = "GO", version = 0)
+modelListFromLocalDB <- MulEA::getModelFromLocalDatabaseAsList(taxonomy_id = 9001, model_source = "GO", version = 0)
+MulEA::removeModelFromLocalDatabase(taxonomy_id = 9001, model_source = "GO", version = 0)
+`
+
+`
+MulEA::saveModelFromDataFrameToGmtFile(modelDF = modelDfFromLocalDB, gmtFilePath = "/home/koralgooll/doktorat/Rpackages/mulea/Mulea/example/fromDf.gmt")
+MulEA::saveModelFromLocalDatabaseToFile(taxonomy_id = 9001, model_source = "GO", version = 0, gmtFilePath = "/home/koralgooll/doktorat/Rpackages/mulea/Mulea/example/fromDb.gmt")
+`
+
+[Statistical tests base on contingency table](#contingency-table-base).
+
+`
+hTestResults <- MulEA::calculateHypergeometricTest(model = modelDfFromLocalDB, sampleVector = dataFromExperiment)
+fTestResults <- MulEA::calculateFisherTest(model = modelDfFromFile, sampleVector = dataFromExperiment)
+chTestResults <- MulEA::calculateChiSquaredTest(model = modelDfFromLocalDB, sampleVector = dataFromExperiment)
+`
+
+[Adjust P-values for Multiple Comparisons.](#multiple-comparisons-problem)
+
+`
+hTestResultsWithAdjustment <- MulEA::calculateHypergeometricTest(model = modelDfFromLocalDB, sampleVector = dataFromExperiment, adjustMethod = "BH")
+fTestResultsWithAdjustment <- MulEA::calculateFisherTest(model = modelDfFromFile, sampleVector = dataFromExperiment, adjustMethod = "bonferroni")
+chTestResultsWithAdjustment <- MulEA::calculateChiSquaredTest(model = modelDfFromLocalDB, sampleVector = dataFromExperiment, adjustMethod = "BY")
+`
 
 
 ## Other
