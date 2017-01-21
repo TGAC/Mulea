@@ -1,4 +1,4 @@
-calculateHypergeometricTest <- function(model, sampleVector, adjustMethod = NA) {
+calculateHypergeometricTest <- function(model, sampleVector) {
     allElements <- unique(unlist(model$listOfValues))
     testResults <- ddply(.data = model,  .variables = c("category"), .fun = function(dfRow) {
         modelSampleIntersection <- intersect(dfRow[1, 'listOfValues'][[1]], sampleVector)
@@ -16,14 +16,55 @@ calculateHypergeometricTest <- function(model, sampleVector, adjustMethod = NA) 
             'k' = k,
             'p-value' = phyper(q, m, n, k, lower.tail = FALSE, log.p = FALSE))
     })
-    if (!is.na(adjustMethod)) {
-      testResults <- data.frame(testResults, "controllingProcedures" = p.adjust(testResults$p.value, method = adjustMethod))
-    }
     testResults
 }
 
+
+gseaPermutationTest <- function(modelWithTestDf, steps, sampleVector) {
+  R_value_obs <- integer(0)
+  for (i in 1:length(modelWithTestDf$p.value)) {
+    R_value_obs[i] <- sum(modelWithTestDf$p.value <= modelWithTestDf$p.value[i])
+  }
+
+  allElements <- unique(unlist(modelWithTestDf$listOfValues))
+  simulationMatrix <- array(dim = c(length(modelWithTestDf$p.value), steps))
+  for (j in 1:steps) {
+    randomData <- sample(allElements, length(sampleVector))
+    for (i in 1:length(modelWithTestDf$p.value)) {
+      modelSampleIntersection <- intersect(modelWithTestDf[i, 'listOfValues'][[1]], randomData)
+      q <- length(modelSampleIntersection)
+      m <- length(modelWithTestDf[i, 'listOfValues'][[1]])
+      n <- length(setdiff(allElements, modelWithTestDf[i, 'listOfValues'][[1]]))
+      k <- length(randomData)
+
+      # Why 1 - pvalue from test?
+      simulationMatrix[i,j] = 1 - phyper(q, m, n, k, lower.tail = FALSE, log.p = FALSE)
+    }
+  }
+  simulationVector <- as.vector(simulationMatrix)
+  R_value_exp <- integer(0)
+  for (l in 1:length(modelWithTestDf$p.value)) {
+    # Why is 15 digits?
+    # P_Sim_round=round(P_Sim_vec, digits=15)
+    R_value_exp[l] <- sum(simulationVector <= modelWithTestDf$p.value[l]) / steps
+  }
+  gseaPermutationTestVector <- R_value_exp / R_value_obs
+  gseaPermutationTestVector
+}
+
+
+adjustPvaluesForMultipleComparisons <- function(modelWithTestsResults, sampleVector, adjustMethod = "bonferroni", steps = 1) {
+  if (adjustMethod == "GSEA") {
+    adjustResult <- data.frame(modelWithTestsResults, "controllingProcedures" = gseaPermutationTest(modelWithTestDf = modelWithTestsResults, steps = steps, sampleVector = sampleVector))
+  } else {
+    adjustResult <- data.frame(modelWithTestsResults, "controllingProcedures" = p.adjust(modelWithTestsResults$p.value, method = adjustMethod))
+  }
+  adjustResult
+}
+
+
 calculateTestOnContingencyTable <- function(testMethod) {
-  function(model, sampleVector, adjustMethod = NA) {
+  function(model, sampleVector) {
     allElements <- unique(unlist(model$listOfValues))
     testResults <- ddply(.data = model,  .variables = c("category"), .fun = function(dfRow) {
       modelSampleIntersection <- intersect(dfRow[1, 'listOfValues'][[1]], sampleVector)
@@ -41,15 +82,6 @@ calculateTestOnContingencyTable <- function(testMethod) {
         'k' = k,
         'testResultsColumnName' = I(list(testMethod(matrix(c(m, q, n, k), nrow = 2)))))
     })
-    if (!is.na(adjustMethod)) {
-      testResults <- data.frame(testResults,
-                                "controllingProcedures" = p.adjust(
-                                    plyr::laply(.data = testResults$testResultsColumnName,
-                                                .fun = function(list) {
-                                                    list$p.value
-                                                }),
-                                    method = adjustMethod))
-    }
     testResults
   }
 }
@@ -57,16 +89,3 @@ calculateTestOnContingencyTable <- function(testMethod) {
 calculateFisherTest <- calculateTestOnContingencyTable(fisher.test)
 
 calculateChiSquaredTest <- calculateTestOnContingencyTable(chisq.test)
-
-calculateGSEATest <- function(model, sampleVector, modelBaseVector) {
-    modelTmpGmtFile <- tempfile(pattern = "file", tmpdir = tempdir(), fileext = ".gmt")
-    saveModelFromDataFrameToGmtFile(modelDF = model[ , !(names(model) %in% c("collection_name"))], gmtFilePath = modelTmpGmtFile)
-    sampleBaseTmpFile <- tempfile(pattern = "file", tmpdir = tempdir(), fileext = ".tmp")
-    write(sampleVector, file = sampleBaseTmpFile, ncolumns = 1, append = FALSE)
-    allElements <- unique(unlist(model$collection))
-    modelBaseVector <- allElements
-    modelBaseTmpFile <- tempfile(pattern = "file", tmpdir = tempdir(), fileext = ".tmp")
-    write(modelBaseVector, file = modelBaseTmpFile, ncolumns = 1, append = FALSE)
-    # TODO : How to present results? Now it is list.
-    runGSEA(databaseFilePath = modelTmpGmtFile, sampleFilePath = sampleBaseTmpFile, populationFilePath = modelBaseTmpFile)
-}

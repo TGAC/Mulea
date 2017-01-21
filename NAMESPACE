@@ -16,4 +16,5 @@ export(runGSEA)
 export(calculateHypergeometricTest)
 export(calculateFisherTest)
 export(calculateChiSquaredTest)
-export(calculateGSEATest)
+export(adjustPvaluesForMultipleComparisons)
+

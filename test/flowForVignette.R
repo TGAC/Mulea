@@ -1,13 +1,13 @@
 #Flow for Vignettes:
 
 #Create SQLite DB on local machine as file or in memory.
-creationOfLocalDB <- MulEA::startLocalDatabase("/home/koralgooll/doktorat/Rpackages/mulea/")
+creationOfLocalDB <- MulEA::startLocalDatabase("/home/koralgooll/doktorat/Rpackages/muleaDb/")
 creationOfLocalDB <- MulEA::startLocalDatabase(":memory:")
 #I case of corrupted data - DB is broken. (You can not reset R session, lock on DB file)
 stopDbResults <- MulEA::stopLocalDatabase()
 
 #Read model from file.
-modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = "/home/koralgooll/doktorat/Rpackages/mulea/Mulea/example/GO2allGenes_FBgnIDs_v2.gmt")
+modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = "/home/koralgooll/R/x86_64-pc-linux-gnu-library/3.3/MulEA/example/model.gmt")
 
 #Add model to database.
 MulEA::addModelToLocalDatabase(model = modelDfFromFile, taxonomy_id = 9001, model_source = "GO", version = 0)
@@ -36,6 +36,6 @@ fTestResults <- MulEA::calculateFisherTest(model = modelDfFromFile, sampleVector
 chTestResults <- MulEA::calculateChiSquaredTest(model = modelDfFromLocalDB, sampleVector = dataFromExperiment)
 
 #Adjust P-values for Multiple Comparisons.
-hTestResultsWithAdjustment <- MulEA::calculateHypergeometricTest(model = modelDfFromLocalDB, sampleVector = dataFromExperiment, adjustMethod = "BH")
-fTestResultsWithAdjustment <- MulEA::calculateFisherTest(model = modelDfFromFile, sampleVector = dataFromExperiment, adjustMethod = "bonferroni")
-chTestResultsWithAdjustment <- MulEA::calculateChiSquaredTest(model = modelDfFromLocalDB, sampleVector = dataFromExperiment, adjustMethod = "BY")
+defaultAdjustment <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestResults, sampleVector = dataFromExp)
+gseaAdjustment <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestResults, sampleVector = dataFromExp, steps = 2, adjustMethod = "GSEA")
+bhAdjustment <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestResults, sampleVector = dataFromExp, adjustMethod = "BH")
