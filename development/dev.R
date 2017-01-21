@@ -11,9 +11,18 @@ devtools::use_vignette(name = "MulEA")
 devtools::use_vignette(name = "test")
 devtools::build_vignettes()
 vignette("test")
-devtools::use_vignette(name = "MulEA")devtools::build() #Make error - use build and reload from Rstudio.
+devtools::use_vignette(name = "MulEA")
 devtools::build(binary = TRUE, args = c('--preclean'))
+devtools::build("/home/koralgooll/doktorat/Rpackages/Mulea/")
 devtools::install()
+devtools::reload()
+dev
+pkgbuild::build(dest_path = ".")
+getwd()
+install("pkgbuild")
+library(pkgbuild)
+library(pkgload)
+library(pkgmaker)
 # Source package is supported on Linux.
 install.packages("/home/koralgooll/doktorat/Rpackages/mulea/Mulea_0.99.0.tar.gz"
                  , repos = NULL, type = "source")
