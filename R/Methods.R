@@ -52,6 +52,38 @@ gseaPermutationTest <- function(modelWithTestDf, steps, sampleVector) {
   gseaPermutationTestVector
 }
 
+gseaPermutationTestPlyr <- function(modelWithTestDf, steps, sampleVector) {
+  R_value_obs <- plyr::daply(.data = modelWithTestDf, .variables = c("category"), .fun = function(dfRow) {
+    sum(modelWithTestDf$p.value <= dfRow$p.value)
+  })
+
+  allElements <- unique(unlist(modelWithTestDf$listOfValues))
+  k <- 1
+  w <- nrow(modelWithTestDf)
+  simulationVector <- numeric(steps * w)
+  for (j in 1:steps) {
+    randomData <- sample(allElements, length(sampleVector))
+    simulationVector[k:(k - 1 + w)] <- plyr::daply(.data = modelWithTestDf, .variables = c("category"), .fun = function(dfRow) {
+      modelSampleIntersection <- intersect(dfRow$listOfValues[[1]], randomData)
+      q <- length(modelSampleIntersection)
+      m <- length(dfRow$listOfValues[[1]])
+      n <- length(setdiff(allElements, dfRow$listOfValues[[1]]))
+      k <- length(randomData)
+
+      # Why 1 - pvalue from test?
+      1 - phyper(q, m, n, k, lower.tail = FALSE, log.p = FALSE)
+    })
+    k <- k + w
+  }
+
+  R_value_exp <- plyr::daply(.data = modelWithTestDf, .variables = c("category"), .fun = function(dfRow) {
+    sum(simulationVector <= dfRow$p.value)
+  })
+
+  gseaPermutationTestVector <- R_value_exp / R_value_obs
+  gseaPermutationTestVector
+}
+
 
 adjustPvaluesForMultipleComparisons <- function(modelWithTestsResults, sampleVector, adjustMethod = "bonferroni", steps = 1) {
   if (adjustMethod == "GSEA") {

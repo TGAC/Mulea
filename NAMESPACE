@@ -17,4 +17,6 @@ export(calculateHypergeometricTest)
 export(calculateFisherTest)
 export(calculateChiSquaredTest)
 export(adjustPvaluesForMultipleComparisons)
+export(gseaPermutationTest)
+export(gseaPermutationTestPlyr)
 
