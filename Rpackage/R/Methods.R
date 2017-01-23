@@ -31,10 +31,12 @@ gseaPermutationTest <- function(modelWithTestDf, steps, sampleVector) {
   for (j in 1:steps) {
     randomData <- sample(allElements, length(sampleVector))
     for (i in 1:length(modelWithTestDf$p.value)) {
-      modelSampleIntersection <- intersect(modelWithTestDf[i, 'listOfValues'][[1]], randomData)
+      concatenatedListOfValues <- c(modelWithTestDf[i, 'listOfValues'][[1]], randomData)
+      modelSampleIntersection <- concatenatedListOfValues[duplicated(concatenatedListOfValues)]
       q <- length(modelSampleIntersection)
       m <- length(modelWithTestDf[i, 'listOfValues'][[1]])
-      n <- length(setdiff(allElements, modelWithTestDf[i, 'listOfValues'][[1]]))
+      modelAllElementsIntersectionLength <- sum(duplicated(c(modelWithTestDf[i, 'listOfValues'][[1]], allElements)))
+      n <- length(allElements) - modelAllElementsIntersectionLength
       k <- length(randomData)
 
       # Why 1 - pvalue from test?
@@ -48,7 +50,44 @@ gseaPermutationTest <- function(modelWithTestDf, steps, sampleVector) {
     # P_Sim_round=round(P_Sim_vec, digits=15)
     R_value_exp[l] <- sum(simulationVector <= modelWithTestDf$p.value[l]) / steps
   }
-  gseaPermutationTestVector <- R_value_exp / R_value_obs
+  gseaPermutationTestVector <- round(R_value_exp / R_value_obs, digits = 4)
+  gseaPermutationTestVector
+}
+
+gseaPermutationTestWithBinaryMatrix <- function(modelWithTestDf, steps, sampleVector) {
+  R_value_obs <- integer(0)
+  for (i in 1:length(modelWithTestDf$p.value)) {
+    R_value_obs[i] <- sum(modelWithTestDf$p.value <= modelWithTestDf$p.value[i])
+  }
+
+  allElements <- unique(unlist(modelWithTestDf$listOfValues))
+  dataMatrix <- array(dim = c(length(modelWithTestDf$category), length(allElements)))
+  for (i in 1:length(modelWithTestDf$category)) {
+    concatenation <- c(modelWithTestDf[i,]$listOfValues[[1]], allElements)
+    dataMatrix[i,] <- duplicated(concatenation)[(length(modelWithTestDf[i,]$listOfValues[[1]])+1):length(concatenation)]
+  }
+  simulationMatrix <- array(dim = c(length(modelWithTestDf$p.value), steps))
+  for (j in 1:steps) {
+    randomData <- logical(length(allElements))
+    randomData[sample(length(allElements), size = length(sampleVector))] <- TRUE
+    for (i in 1:length(modelWithTestDf$p.value)) {
+      modelSampleIntersection <- dataMatrix[i,] & randomData
+      q <- sum(modelSampleIntersection)
+      m <- length(modelWithTestDf[i, 'listOfValues'][[1]])
+      n <- length(allElements) - sum(dataMatrix[i,])
+      k <- sum(randomData)
+      # Why 1 - pvalue from test?
+      simulationMatrix[i,j] <- 1 - phyper(q, m, n, k, lower.tail = FALSE, log.p = FALSE)
+    }
+  }
+  simulationVector <- as.vector(simulationMatrix)
+  R_value_exp <- integer(0)
+  for (l in 1:length(modelWithTestDf$p.value)) {
+    # Why is 15 digits?
+    # P_Sim_round=round(P_Sim_vec, digits=15)
+    R_value_exp[l] <- sum(simulationVector <= modelWithTestDf$p.value[l]) / steps
+  }
+  gseaPermutationTestVector <- round(R_value_exp / R_value_obs, digits = 4)
   gseaPermutationTestVector
 }
 
@@ -56,6 +95,7 @@ gseaPermutationTestPlyr <- function(modelWithTestDf, steps, sampleVector) {
   R_value_obs <- plyr::daply(.data = modelWithTestDf, .variables = c("category"), .fun = function(dfRow) {
     sum(modelWithTestDf$p.value <= dfRow$p.value)
   })
+  names(R_value_obs) <- NULL
 
   allElements <- unique(unlist(modelWithTestDf$listOfValues))
   k <- 1
@@ -64,10 +104,12 @@ gseaPermutationTestPlyr <- function(modelWithTestDf, steps, sampleVector) {
   for (j in 1:steps) {
     randomData <- sample(allElements, length(sampleVector))
     simulationVector[k:(k - 1 + w)] <- plyr::daply(.data = modelWithTestDf, .variables = c("category"), .fun = function(dfRow) {
-      modelSampleIntersection <- intersect(dfRow$listOfValues[[1]], randomData)
+      concatenatedListOfValues <- c(dfRow$listOfValues[[1]], randomData)
+      modelSampleIntersection <- concatenatedListOfValues[duplicated(concatenatedListOfValues)]
       q <- length(modelSampleIntersection)
       m <- length(dfRow$listOfValues[[1]])
-      n <- length(setdiff(allElements, dfRow$listOfValues[[1]]))
+      modelAllElementsIntersectionLength <- sum(duplicated(c(dfRow$listOfValues[[1]], allElements)))
+      n <- length(allElements) - modelAllElementsIntersectionLength
       k <- length(randomData)
 
       # Why 1 - pvalue from test?
@@ -77,10 +119,11 @@ gseaPermutationTestPlyr <- function(modelWithTestDf, steps, sampleVector) {
   }
 
   R_value_exp <- plyr::daply(.data = modelWithTestDf, .variables = c("category"), .fun = function(dfRow) {
-    sum(simulationVector <= dfRow$p.value)
+    sum(simulationVector <= dfRow$p.value) / steps
   })
+  names(R_value_exp) <- NULL
 
-  gseaPermutationTestVector <- R_value_exp / R_value_obs
+  gseaPermutationTestVector <- round(R_value_exp / R_value_obs, digits = 4)
   gseaPermutationTestVector
 }
 

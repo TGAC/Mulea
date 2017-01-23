@@ -19,4 +19,5 @@ export(calculateChiSquaredTest)
 export(adjustPvaluesForMultipleComparisons)
 export(gseaPermutationTest)
 export(gseaPermutationTestPlyr)
+export(gseaPermutationTestWithBinaryMatrix)
 
