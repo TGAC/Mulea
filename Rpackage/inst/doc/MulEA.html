@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Wiktor Jurkowski, Eszter Ari, David Fazekas, Cezary Turek" />
+
+<meta name="date" content="2017-01-06" />
+
+<title>MulEA</title>
+
+
+
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">MulEA</h1>
+<h4 class="author"><em>Wiktor Jurkowski, Eszter Ari, David Fazekas, Cezary Turek</em></h4>
+<h4 class="date"><em>2017-01-06</em></h4>
+
+
+
+<p>THIS IS VIGNETTE in time of development. :)</p>
+<p>MulEA (Multi Enrichment Analysis) is a package/tool for functional interpretation and integration of multi-omics data sets. It can work with ontologies as GO, …</p>
+<p>Actually implemented features (explained in details … ) are:</p>
+<ul>
+<li><a href="#mulea-database-workflow">Mulea Database Workflow</a>
+<ul>
+<li><a href="#file">File</a></li>
+<li><a href="#local-mulea-db">Local Mulea DB</a></li>
+<li><a href="#global-mulea-db">Global Mulea DB</a></li>
+</ul></li>
+<li><a href="#data-analysis">Data Analysis</a>
+<ul>
+<li><a href="#analysis-methods">Analysis Methods</a>
+<ul>
+<li><a href="#contingency-table-base">Contingency Table Base</a>
+<ul>
+<li><a href="#hypergeometric-test">Hypergeometric Test</a></li>
+<li><a href="#fisher-test">Fisher Test</a></li>
+<li><a href="#chi-squared-test">Chi Squared Test</a></li>
+</ul></li>
+<li><a href="#ranking-base">Ranking Base</a>
+<ul>
+<li><a href="#kolmogorov-smirnov-test">Kolmogorov Smirnov Test</a></li>
+</ul></li>
+<li><a href="#graph-base">Graph Base</a></li>
+</ul></li>
+<li><a href="#extra-operations">Extra Operations</a>
+<ul>
+<li><a href="#multiple-comparisons-problem">Multiple Comparisons Problem</a>
+<ul>
+<li><a href="#gsea">GSEA</a></li>
+<li><a href="#general-approach">General Approach</a></li>
+</ul></li>
+</ul></li>
+</ul></li>
+<li><a href="#code-snippet">Code Snippet</a></li>
+<li><a href="#other">Other</a></li>
+</ul>
+<div id="mulea-database-workflow" class="section level2">
+<h2>Mulea Database Workflow</h2>
+<p>We have 3 ways of working with data in MulEA package. You can work directly from our global DB, you can work with your local DB or with files. Below you can find detailed instructions.</p>
+<div id="file" class="section level3">
+<h3>File</h3>
+<p>File which includes model need to be in GMT: Gene Matrix Transposed file format (*.gmt) (<a href="http://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29">format explanation</a>). You can find example of that file under MulEA installation directory in example folder. To find installation directory use find.package(“MulEA”) command.</p>
+<p>To read GMT file as dataframe use this methos please: <code>MulEA::readGmtFileAsDF()</code>. Method accepts one required (*) argument <code>gmtFilePath</code>.</p>
+<ul>
+<li><code>gmtFilePath</code> - It is path to file, which include model. Example: <code>&quot;R/MulEA/example/model.gmt&quot;</code></li>
+</ul>
+<p>Model is read into the data frame which looks like that:</p>
+<table>
+<caption>Model Data Frame</caption>
+<thead>
+<tr class="header">
+<th align="left">category</th>
+<th align="left">description</th>
+<th align="left">listOfValues</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><a href="GO:0000001" class="uri">GO:0000001</a></td>
+<td align="left">“mitochondrion inheritance”</td>
+<td align="left">FBgn0033690, FBgn0261618</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="GO:0000002" class="uri">GO:0000002</a></td>
+<td align="left">“mitochondrial genome maintenance”</td>
+<td align="left">FBgn0004407, FBgn0010438, FBgn0032154, FBgn0039930, FBgn0040268, FBgn0013674, FBgn0037008, FBgn0003116</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="GO:0000009" class="uri">GO:0000009</a></td>
+<td align="left">“alpha-1,6-mannosyltransferase activity”</td>
+<td align="left">FBgn0037743, FBgn0035401</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="GO:0000010" class="uri">GO:0000010</a></td>
+<td align="left">“trans-hexaprenyltranstransferase activity”</td>
+<td align="left">FBgn0037044, FBgn0051005</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="GO:0000012" class="uri">GO:0000012</a></td>
+<td align="left">“single strand break repair”</td>
+<td align="left">FBgn0026737, FBgn0026751, FBgn0038704</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="GO:0000014" class="uri">GO:0000014</a></td>
+<td align="left">“single-stranded DNA endodeoxyribonuclease activity”</td>
+<td align="left">FBgn0002887, FBgn0028434, FBgn0030170, FBgn0263831</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="GO:0000015" class="uri">GO:0000015</a></td>
+<td align="left">“phosphopyruvate hydratase complex”</td>
+<td align="left">FBgn0000579</td>
+</tr>
+</tbody>
+</table>
+<p>You can also save data frame which represents model to GMT file. To do it use <code>MulEA::saveModelFromDataFrameToGmtFile()</code>. You have to provide two arguments <code>modelDF</code>, <code>gmtFilePath</code>.</p>
+<ul>
+<li><code>modelDF</code> - A data frame represents model.</li>
+<li><code>gmtFilePath</code> - Path to file where you want to save model. Example: <code>&quot;R/MulEA/example/savedModel.gmt&quot;</code></li>
+</ul>
+</div>
+<div id="local-mulea-db" class="section level3">
+<h3>Local Mulea DB</h3>
+<p>With MulEA you can have all your models (models from files, global DB etc.) in one place. This place is local DB. This open for you an easy way to control, share and work with all your models. Before storing or downloading models thare you need to run database. To do it please use <code>MulEA::startLocalDatabase()</code>, this method creates the same schema as on Global DB, but locally on your computer. If schema has been already created it reads database. This method also has one argument:</p>
+<ul>
+<li><code>muleaDBLocalization</code> - By default its value is <code>&quot;:memory:&quot;</code> which means that DB is created in memory of computer. If you want to have file which represents you database, for example for sharing it, you should put a directory when SQLite file should be created. Example: <code>&quot;/home/muleaDB/&quot;</code>. File with name <code>MulEA.sqlite</code> will be created there.</li>
+</ul>
+<p>To see how database look like please install add-on to Mozilla Firefox <a href="https://addons.mozilla.org/en-US/firefox/addon/sqlite-manager/" class="uri">https://addons.mozilla.org/en-US/firefox/addon/sqlite-manager/</a> and then go to url <a href="chrome://sqlitemanager/content/sqlitemanager.xul" class="uri">chrome://sqlitemanager/content/sqlitemanager.xul</a> choose from main menu Database &gt; Connect Database, then choose file MulEA.sqlite.</p>
+<p>It is good practise to close database connection after you finish work with MulEA. To do it type that command: <code>MulEA::stopLocalDatabase()</code>.</p>
+<p>If database is running you are ready to add model to it. To do it use <code>MulEA::addModelToLocalDatabase()</code>. AddModelToLocalDatabase accepts 7 arguments. Four of them are required (*) <code>model</code>, <code>taxonomy_id</code>, <code>model_source</code>, <code>version</code>, and other 3 are optional <code>scientific_name</code>, <code>common_english_name</code>, <code>description</code>.</p>
+<ul>
+<li><code>model</code> - Data Frame with model. For example a Data Frame returned by <code>MulEA::readGmtFileAsDF()</code>.</li>
+<li><code>taxonomy_id</code> - It is an integer represents a taxonomy id from NCBI. In case of homo sapiense it is 9001.</li>
+<li><code>model_source</code> - It is a String. It should represents origin of mode. Gen Ontology can be “GO”.</li>
+<li><code>version</code> - Integer represents a version of model. It alows you to have many versions of the same model. It it is secound model of homo sapiense from “GO”, then good practice is putting there 2.</li>
+<li><code>scientific_name</code> - It is text, which represents scientific name. It should helps you to faster identify organism.</li>
+<li><code>common_english_name</code> - The same as above.</li>
+<li><code>description</code> - It is a place for your own notes about this specific model.</li>
+</ul>
+<p>To list models from you local DB invoke <code>MulEA::listModelsFromLocalDatabase()</code> (not implemented yet)</p>
+<p>You can remove model from DB by <code>MulEA::removeModelFromLocalDatabase()</code>. Arguments of that method are Primary Kay (PK) of organisms_models table.</p>
+<ul>
+<li><code>taxonomy_id</code> - Integer represents a taxonomi id of organism.</li>
+<li><code>model_source</code> - Origin of model.</li>
+<li><code>version</code> - Version of model in DB.</li>
+</ul>
+<p>Getting model from DB is achived by two methods; <code>MulEA::getModelFromLocalDatabaseAsDf</code> and <code>MulEA::getModelFromLocalDatabaseAsList</code>. As name says it can be get from database in two way as data frame or list. Data frame is used with analysis methods provided by MulEA. List representation can be usefull as input to other packages methods. Both of them accept the same arguments, which are required (*) <code>taxonomy_id</code>, <code>model_source</code>, <code>version</code>.</p>
+<p>In addition MulEA provides a helper method to save one model from local DB in file in GMT format. <code>MulEA::saveModelFromLocalDatabaseToFile()</code> accepts <code>taxonomy_id</code>, <code>model_source</code>, <code>version</code>, <code>gmtFilePath</code> all of them are required (*).</p>
+<ul>
+<li><code>gmtFilePath</code> - It is path to gmt file where model from local DB will be saved.</li>
+</ul>
+</div>
+<div id="global-mulea-db" class="section level3">
+<h3>Global Mulea DB</h3>
+<p>(Not implemented yet.)</p>
+</div>
+</div>
+<div id="data-analysis" class="section level2">
+<h2>Data Analysis</h2>
+<p>“Analysis of data is a process of inspecting, cleansing, transforming, and modeling data with the goal of discovering useful information, suggesting conclusions, and supporting decision-making.”, <a href="https://en.wikipedia.org/wiki/Data_analysis">Wikipedia</a>. MulEA makes data analysis on data frames. We implemented for you three types of tests base on contingency tables, rankings and topology of data.</p>
+<div id="analysis-methods" class="section level3">
+<h3>Analysis Methods</h3>
+<div id="contingency-table-base" class="section level4">
+<h4>Contingency Table Base</h4>
+<p>Hypothesis tests may be performed on contingency tables. Cells in contingency table are defined as relationships between the row and column variables. MulEA provides few tests which are based on a contingency table. Hypergeometric, Fisher and Chi Squared tests are documented below.</p>
+<div id="hypergeometric-test" class="section level5">
+<h5>Hypergeometric Test</h5>
+<p>Hypergeometric test bases on <a href="https://en.wikipedia.org/wiki/Hypergeometric_distribution">hypergeometric distribution</a>. To perform it on some model you should invoke this method <code>MulEA::calculateHypergeometricTest()</code> with below parameters:</p>
+<ul>
+<li><code>model</code> - it is place for data frame represents model. Read it from file or load from DBs.</li>
+<li><code>sampleVector</code> - It is a vector of your experimental data. Example: <code>dataFromExperiment &lt;- c(&quot;FBgn0004407&quot;, &quot;FBgn0010438&quot;, &quot;FBgn0003742&quot;)</code>.</li>
+<li><code>adjustMethod = NA</code> - as you can see, by default is is set to NA. You can specify an algorithm which helps you with <a href="#multiple-comparisons-problem">Multiple Comparisons Problem</a>.</li>
+</ul>
+<p>Data frame which you achieve as a results of running of this test looks like that:</p>
+<table>
+<caption>Hypergeometric Test Result Data Frame</caption>
+<thead>
+<tr class="header">
+<th align="left">category</th>
+<th align="left">description</th>
+<th align="left">listOfValues</th>
+<th align="left">listOfValuesUnderCategory</th>
+<th align="right">q</th>
+<th align="right">m</th>
+<th align="right">n</th>
+<th align="right">k</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><a href="GO:0000001" class="uri">GO:0000001</a></td>
+<td align="left">“mitochondrion inheritance”</td>
+<td align="left">FBgn0033690, FBgn0261618</td>
+<td align="left"></td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">20</td>
+<td align="right">7</td>
+<td align="right">0.5454545</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="GO:0000002" class="uri">GO:0000002</a></td>
+<td align="left">“mitochondrial genome maintenance”</td>
+<td align="left">FBgn0004407, FBgn0010438, FBgn0032154, FBgn0039930, FBgn0040268, FBgn0013674, FBgn0037008, FBgn0003116</td>
+<td align="left">FBgn0004407, FBgn0010438</td>
+<td align="right">2</td>
+<td align="right">8</td>
+<td align="right">14</td>
+<td align="right">7</td>
+<td align="right">0.5103199</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="GO:0000009" class="uri">GO:0000009</a></td>
+<td align="left">“alpha-1,6-mannosyltransferase activity”</td>
+<td align="left">FBgn0037743, FBgn0035401</td>
+<td align="left"></td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">20</td>
+<td align="right">7</td>
+<td align="right">0.5454545</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="GO:0000010" class="uri">GO:0000010</a></td>
+<td align="left">“trans-hexaprenyltranstransferase activity”</td>
+<td align="left">FBgn0037044, FBgn0051005</td>
+<td align="left">FBgn0037044</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">20</td>
+<td align="right">7</td>
+<td align="right">0.0909091</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="GO:0000012" class="uri">GO:0000012</a></td>
+<td align="left">“single strand break repair”</td>
+<td align="left">FBgn0026737, FBgn0026751, FBgn0038704</td>
+<td align="left"></td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">19</td>
+<td align="right">7</td>
+<td align="right">0.7045455</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="GO:0000014" class="uri">GO:0000014</a></td>
+<td align="left">“single-stranded DNA endodeoxyribonuclease activity”</td>
+<td align="left">FBgn0002887, FBgn0028434, FBgn0030170, FBgn0263831</td>
+<td align="left">FBgn0002887</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">18</td>
+<td align="right">7</td>
+<td align="right">0.3779904</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="GO:0000015" class="uri">GO:0000015</a></td>
+<td align="left">“phosphopyruvate hydratase complex”</td>
+<td align="left">FBgn0000579</td>
+<td align="left"></td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">21</td>
+<td align="right">7</td>
+<td align="right">0.3181818</td>
+</tr>
+</tbody>
+</table>
+<p>Columns names are <code>category</code>, <code>description</code>, <code>listOfValues</code>, <code>listOfValuesUnderCategory</code>, <code>q</code>, <code>m</code>, <code>n</code>, <code>k</code>, <code>p.value</code>. First three a are copies from input data frame. <code>listOfValuesUnderCategory</code> represents an intersection of list of values under category and experimental data vector. Contingency table in this test is represented by <code>q</code>, <code>m</code>, <code>n</code>, <code>k</code>. P-values are in the last column of presented DF.</p>
+</div>
+<div id="fisher-test" class="section level5">
+<h5>Fisher Test</h5>
+<p><a href="#https://en.wikipedia.org/wiki/Fisher's_exact_test">Fisher test</a> is represented in MulEA by <code>MulEA::calculateFisherTest()</code> method. It takes the same list of arguments as <a href="#hypergeometric-test">Hypergeometric Test</a>, but it procucts different results.</p>
+<table>
+<caption>Fisher Test Result Data Frame</caption>
+<thead>
+<tr class="header">
+<th align="left">category</th>
+<th align="left">description</th>
+<th align="left">listOfValues</th>
+<th align="left">listOfValuesUnderCategory</th>
+<th align="right">q</th>
+<th align="right">m</th>
+<th align="right">n</th>
+<th align="right">k</th>
+<th align="left">testResultsColumnName</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><a href="GO:0000001" class="uri">GO:0000001</a></td>
+<td align="left">“mitochondrion inheritance”</td>
+<td align="left">FBgn0033690, FBgn0261618</td>
+<td align="left"></td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">20</td>
+<td align="right">7</td>
+<td align="left">1, 0.0575773286605058, Inf, Inf, 1, two.sided, Fisher’s Exact Test for Count Data, matrix(c(m, q, n, k), nrow = 2)</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="GO:0000002" class="uri">GO:0000002</a></td>
+<td align="left">“mitochondrial genome maintenance”</td>
+<td align="left">FBgn0004407, FBgn0010438, FBgn0032154, FBgn0039930, FBgn0040268, FBgn0013674, FBgn0037008, FBgn0003116</td>
+<td align="left">FBgn0004407, FBgn0010438</td>
+<td align="right">2</td>
+<td align="right">8</td>
+<td align="right">14</td>
+<td align="right">5</td>
+<td align="left">1, 0.175018156034401, 18.1028516957688, 1.41161961179334, 1, two.sided, Fisher’s Exact Test for Count Data, matrix(c(m, q, n, k), nrow = 2)</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="GO:0000009" class="uri">GO:0000009</a></td>
+<td align="left">“alpha-1,6-mannosyltransferase activity”</td>
+<td align="left">FBgn0037743, FBgn0035401</td>
+<td align="left"></td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">20</td>
+<td align="right">7</td>
+<td align="left">1, 0.0575773286605058, Inf, Inf, 1, two.sided, Fisher’s Exact Test for Count Data, matrix(c(m, q, n, k), nrow = 2)</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="GO:0000010" class="uri">GO:0000010</a></td>
+<td align="left">“trans-hexaprenyltranstransferase activity”</td>
+<td align="left">FBgn0037044, FBgn0051005</td>
+<td align="left">FBgn0037044</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">20</td>
+<td align="right">6</td>
+<td align="left">1, 0.0270798155178697, 41.2344361880733, 0.6117981620591, 1, two.sided, Fisher’s Exact Test for Count Data, matrix(c(m, q, n, k), nrow = 2)</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="GO:0000012" class="uri">GO:0000012</a></td>
+<td align="left">“single strand break repair”</td>
+<td align="left">FBgn0026737, FBgn0026751, FBgn0038704</td>
+<td align="left"></td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">19</td>
+<td align="right">7</td>
+<td align="left">0.557471264367816, 0.125355123686844, Inf, Inf, 1, two.sided, Fisher’s Exact Test for Count Data, matrix(c(m, q, n, k), nrow = 2)</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="GO:0000014" class="uri">GO:0000014</a></td>
+<td align="left">“single-stranded DNA endodeoxyribonuclease activity”</td>
+<td align="left">FBgn0002887, FBgn0028434, FBgn0030170, FBgn0263831</td>
+<td align="left">FBgn0002887</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">18</td>
+<td align="right">6</td>
+<td align="left">1, 0.100231293343166, 76.4296454814183, 1.3208792517386, 1, two.sided, Fisher’s Exact Test for Count Data, matrix(c(m, q, n, k), nrow = 2)</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="GO:0000015" class="uri">GO:0000015</a></td>
+<td align="left">“phosphopyruvate hydratase complex”</td>
+<td align="left">FBgn0000579</td>
+<td align="left"></td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">21</td>
+<td align="right">7</td>
+<td align="left">1, 0.00817400568181819, Inf, Inf, 1, two.sided, Fisher’s Exact Test for Count Data, matrix(c(m, q, n, k), nrow = 2)</td>
+</tr>
+</tbody>
+</table>
+<p>Structure of single cell of test results column is the same as R documentation about <a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/fisher.test.html">Fisher’s Exact Test</a>. To get it from data frame you can use similar formula to this <code>fisherTest[4,]$testResultsColumnName[[1]]</code>. It takes fourth row of resulted data frame and takes only unlisted cell with test resut, it looks like this:</p>
+<pre><code>Fisher's Exact Test for Count Data</code></pre>
+<p>data: matrix(c(m, q, n, k), nrow = 2) p-value = 1 alternative hypothesis: true odds ratio is not equal to 1 95 percent confidence interval: 0.02707982 41.23443619 sample estimates: odds ratio 0.6117982</p>
+</div>
+<div id="chi-squared-test" class="section level5">
+<h5>Chi Squared Test</h5>
+<p>The last test from that category is <a href="https://en.wikipedia.org/wiki/Chi-squared_test">Chi Squared Test</a>. To calculate it on the groups from model data frame you have to invoke this method: <code>MulEA::calculateChiSquaredTest()</code>. It takes the same list of arguments as two privously presented methods. Result data frame looks like below (We have presented only firs three rows, it is space consuming :)):</p>
+<table>
+<caption>Chi Squared Test Result Data Frame</caption>
+<thead>
+<tr class="header">
+<th align="left">category</th>
+<th align="left">description</th>
+<th align="left">listOfValues</th>
+<th align="left">listOfValuesUnderCategory</th>
+<th align="right">q</th>
+<th align="right">m</th>
+<th align="right">n</th>
+<th align="right">k</th>
+<th align="left">testResultsColumnName</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><a href="GO:0000001" class="uri">GO:0000001</a></td>
+<td align="left">“mitochondrion inheritance”</td>
+<td align="left">FBgn0033690, FBgn0261618</td>
+<td align="left"></td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">20</td>
+<td align="right">7</td>
+<td align="left">4.42753785760586e-31, 1, 0.999999999999999, Pearson’s Chi-squared test with Yates’ continuity correction, matrix(c(m, q, n, k), nrow = 2), 2, 0, 20, 7, 1.51724137931034, 0.482758620689655, 20.4827586206897, 6.51724137931035, 0.391924757669098, -0.694808333779651, -0.106668408205915, 0.189102876310392, 0.826741606248097, -0.826741606248097, -0.826741606248096, 0.826741606248096</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="GO:0000002" class="uri">GO:0000002</a></td>
+<td align="left">“mitochondrial genome maintenance”</td>
+<td align="left">FBgn0004407, FBgn0010438, FBgn0032154, FBgn0039930, FBgn0040268, FBgn0013674, FBgn0037008, FBgn0003116</td>
+<td align="left">FBgn0004407, FBgn0010438</td>
+<td align="right">2</td>
+<td align="right">8</td>
+<td align="right">14</td>
+<td align="right">5</td>
+<td align="left">0, 1, 1, Pearson’s Chi-squared test with Yates’ continuity correction, matrix(c(m, q, n, k), nrow = 2), 8, 2, 14, 5, 7.58620689655172, 2.41379310344828, 14.4137931034483, 4.58620689655172, 0.15023492575084, -0.266338056971085, -0.108991870569276, 0.19322193483297, 0.377783585478882, -0.377783585478882, -0.377783585478882, 0.377783585478882</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="GO:0000009" class="uri">GO:0000009</a></td>
+<td align="left">“alpha-1,6-mannosyltransferase activity”</td>
+<td align="left">FBgn0037743, FBgn0035401</td>
+<td align="left"></td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">20</td>
+<td align="right">7</td>
+<td align="left">4.42753785760586e-31, 1, 0.999999999999999, Pearson’s Chi-squared test with Yates’ continuity correction, matrix(c(m, q, n, k), nrow = 2), 2, 0, 20, 7, 1.51724137931034, 0.482758620689655, 20.4827586206897, 6.51724137931035, 0.391924757669098, -0.694808333779651, -0.106668408205915, 0.189102876310392, 0.826741606248097, -0.826741606248097, -0.826741606248096, 0.826741606248096</td>
+</tr>
+</tbody>
+</table>
+<p>Similar formula to this can be used to achive results for specific row of data <code>chiSquaredTest[2,]$testResultsColumnName[[1]]</code>. Result cell is in form of result from <a href="https://stat.ethz.ch/R-manual/R-devel/library/stats/html/chisq.test.html">Pearson’s Chi-squared Test</a>.</p>
+<pre><code>Pearson's Chi-squared test with Yates' continuity correction</code></pre>
+<p>data: matrix(c(m, q, n, k), nrow = 2) X-squared = 2.9652e-30, df = 1, p-value = 1</p>
+</div>
+</div>
+<div id="ranking-base" class="section level4">
+<h4>Ranking Base</h4>
+<p>(not implemented yet)</p>
+<div id="kolmogorov-smirnov-test" class="section level5">
+<h5>Kolmogorov Smirnov Test</h5>
+<p>(not implemented yet)</p>
+</div>
+</div>
+<div id="graph-base" class="section level4">
+<h4>Graph Base</h4>
+<p>(not implemented yet)</p>
+</div>
+</div>
+<div id="extra-operations" class="section level3">
+<h3>Extra Operations</h3>
+<p>(not implemented yet)</p>
+<div id="multiple-comparisons-problem" class="section level4">
+<h4>Multiple Comparisons Problem</h4>
+<div id="gsea" class="section level5">
+<h5>GSEA</h5>
+<p>(not implemented yet)</p>
+</div>
+<div id="general-approach" class="section level5">
+<h5>General Approach</h5>
+<p>According to article <a href="https://en.wikipedia.org/wiki/Multiple_comparisons_problem">Multiple Comparisons Problem</a> you can adjust p-values of tested models by adding <code>adjustMethod</code> argument to contyngency table based tests methods. Value of this argument is one of listed values: “holm”, “hochberg”, “hommel”, “bonferroni”, “BH”, “BY”, “fdr”. You can find references to the method under this <a href="http://stat.ethz.ch/R-manual/R-devel/library/stats/html/p.adjust.html">link</a>.</p>
+<p>Data frame with adjustment of p-values has one extra column. You can see that column in below model:</p>
+<table>
+<caption>Hypergeometric Test Result With Adjustment Data Frame</caption>
+<thead>
+<tr class="header">
+<th align="left">category</th>
+<th align="left">description</th>
+<th align="left">listOfValues</th>
+<th align="left">listOfValuesUnderCategory</th>
+<th align="right">q</th>
+<th align="right">m</th>
+<th align="right">n</th>
+<th align="right">k</th>
+<th align="right">p.value</th>
+<th align="right">controllingProcedures</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><a href="GO:0000001" class="uri">GO:0000001</a></td>
+<td align="left">“mitochondrion inheritance”</td>
+<td align="left">FBgn0033690, FBgn0261618</td>
+<td align="left"></td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">20</td>
+<td align="right">7</td>
+<td align="right">0.5454545</td>
+<td align="right">0.6363636</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="GO:0000002" class="uri">GO:0000002</a></td>
+<td align="left">“mitochondrial genome maintenance”</td>
+<td align="left">FBgn0004407, FBgn0010438, FBgn0032154, FBgn0039930, FBgn0040268, FBgn0013674, FBgn0037008, FBgn0003116</td>
+<td align="left">FBgn0004407, FBgn0010438</td>
+<td align="right">2</td>
+<td align="right">8</td>
+<td align="right">14</td>
+<td align="right">7</td>
+<td align="right">0.5103199</td>
+<td align="right">0.6363636</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="GO:0000009" class="uri">GO:0000009</a></td>
+<td align="left">“alpha-1,6-mannosyltransferase activity”</td>
+<td align="left">FBgn0037743, FBgn0035401</td>
+<td align="left"></td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">20</td>
+<td align="right">7</td>
+<td align="right">0.5454545</td>
+<td align="right">0.6363636</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="GO:0000010" class="uri">GO:0000010</a></td>
+<td align="left">“trans-hexaprenyltranstransferase activity”</td>
+<td align="left">FBgn0037044, FBgn0051005</td>
+<td align="left">FBgn0037044</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">20</td>
+<td align="right">7</td>
+<td align="right">0.0909091</td>
+<td align="right">0.6363636</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="GO:0000012" class="uri">GO:0000012</a></td>
+<td align="left">“single strand break repair”</td>
+<td align="left">FBgn0026737, FBgn0026751, FBgn0038704</td>
+<td align="left"></td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">19</td>
+<td align="right">7</td>
+<td align="right">0.7045455</td>
+<td align="right">0.7045455</td>
+</tr>
+<tr class="even">
+<td align="left"><a href="GO:0000014" class="uri">GO:0000014</a></td>
+<td align="left">“single-stranded DNA endodeoxyribonuclease activity”</td>
+<td align="left">FBgn0002887, FBgn0028434, FBgn0030170, FBgn0263831</td>
+<td align="left">FBgn0002887</td>
+<td align="right">1</td>
+<td align="right">4</td>
+<td align="right">18</td>
+<td align="right">7</td>
+<td align="right">0.3779904</td>
+<td align="right">0.6363636</td>
+</tr>
+<tr class="odd">
+<td align="left"><a href="GO:0000015" class="uri">GO:0000015</a></td>
+<td align="left">“phosphopyruvate hydratase complex”</td>
+<td align="left">FBgn0000579</td>
+<td align="left"></td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">21</td>
+<td align="right">7</td>
+<td align="right">0.3181818</td>
+<td align="right">0.6363636</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div id="code-snippet" class="section level2">
+<h2>Code Snippet</h2>
+<p>You can copy paste this code to start working with MulEA more easely. All Snippet of the code regarding to some capture of this vignettes:</p>
+<p><a href="#file">Reading GMT File</a>.</p>
+<p><code>pathToModelGmtFile &lt;- paste(find.package(&quot;MulEA&quot;),&quot;/example/model.gmt&quot;, sep = &quot;&quot;) modelDfFromFile &lt;- MulEA::readGmtFileAsDF(gmtFilePath = pathToModelGmtFile) knitr::kable(modelDfFromFile, caption = &quot;Model Data Frame&quot;)</code></p>
+<p><a href="#local-mulea-db">SQLite DB on local machine</a>.</p>
+<p><code>creationOfLocalDB &lt;- MulEA::startLocalDatabase(&quot;/home/koralgooll/doktorat/Rpackages/mulea/&quot;) creationOfLocalDB &lt;- MulEA::startLocalDatabase(&quot;:memory:&quot;)</code></p>
+<p><code>stopDbResults &lt;- MulEA::stopLocalDatabase()</code></p>
+<p><code>MulEA::addModelToLocalDatabase(model = modelDfFromFile, taxonomy_id = 9001, model_source = &quot;GO&quot;, version = 0) modelDfFromLocalDB &lt;- MulEA::getModelFromLocalDatabaseAsDf(taxonomy_id = 9001, model_source = &quot;GO&quot;, version = 0) modelListFromLocalDB &lt;- MulEA::getModelFromLocalDatabaseAsList(taxonomy_id = 9001, model_source = &quot;GO&quot;, version = 0) MulEA::removeModelFromLocalDatabase(taxonomy_id = 9001, model_source = &quot;GO&quot;, version = 0)</code></p>
+<p><code>MulEA::saveModelFromDataFrameToGmtFile(modelDF = modelDfFromLocalDB, gmtFilePath = &quot;/home/koralgooll/doktorat/Rpackages/mulea/Mulea/example/fromDf.gmt&quot;) MulEA::saveModelFromLocalDatabaseToFile(taxonomy_id = 9001, model_source = &quot;GO&quot;, version = 0, gmtFilePath = &quot;/home/koralgooll/doktorat/Rpackages/mulea/Mulea/example/fromDb.gmt&quot;)</code></p>
+<p><a href="#contingency-table-base">Statistical tests base on contingency table</a>.</p>
+<p><code>hTestResults &lt;- MulEA::calculateHypergeometricTest(model = modelDfFromLocalDB, sampleVector = dataFromExperiment) fTestResults &lt;- MulEA::calculateFisherTest(model = modelDfFromFile, sampleVector = dataFromExperiment) chTestResults &lt;- MulEA::calculateChiSquaredTest(model = modelDfFromLocalDB, sampleVector = dataFromExperiment)</code></p>
+<p><a href="#multiple-comparisons-problem">Adjust P-values for Multiple Comparisons.</a></p>
+<p><code>hTestResultsWithAdjustment &lt;- MulEA::calculateHypergeometricTest(model = modelDfFromLocalDB, sampleVector = dataFromExperiment, adjustMethod = &quot;BH&quot;) fTestResultsWithAdjustment &lt;- MulEA::calculateFisherTest(model = modelDfFromFile, sampleVector = dataFromExperiment, adjustMethod = &quot;bonferroni&quot;) chTestResultsWithAdjustment &lt;- MulEA::calculateChiSquaredTest(model = modelDfFromLocalDB, sampleVector = dataFromExperiment, adjustMethod = &quot;BY&quot;)</code></p>
+</div>
+<div id="other" class="section level2">
+<h2>Other</h2>
+<p>(not implemented yet)</p>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
