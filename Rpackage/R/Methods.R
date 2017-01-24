@@ -40,6 +40,7 @@ gseaPermutationTest <- function(modelWithTestDf, steps, sampleVector) {
     }
   }
   simulationVector <- as.vector(simulationMatrix)
+
   R_value_exp <- integer(0)
   for (l in 1:length(modelWithTestDf$p.value)) {
     # Why is 15 digits?
@@ -57,19 +58,18 @@ gseaPermutationTestWithBinaryMatrix <- function(modelWithTestDf, steps, sampleVe
   }
 
   allElements <- unique(unlist(modelWithTestDf$listOfValues))
-  dataMatrix <- array(dim = c(length(modelWithTestDf$category), length(allElements)))
+  dataMatrix <- list()
   for (i in 1:length(modelWithTestDf$category)) {
     concatenation <- c(modelWithTestDf[i,]$listOfValues[[1]], allElements)
-    dataMatrix[i,] <- duplicated(concatenation)[(length(modelWithTestDf[i,]$listOfValues[[1]])+1):length(concatenation)]
+    dataMatrix <- append(dataMatrix, list(as.bit(duplicated(concatenation)[(length(modelWithTestDf[i,]$listOfValues[[1]])+1):length(concatenation)])))
   }
+
   simulationMatrix <- array(dim = c(length(modelWithTestDf$p.value), steps))
   for (j in 1:steps) {
-    randomData <- logical(length(allElements))
-    randomData[sample(length(allElements), size = length(sampleVector))] <- TRUE
-    for (i in 1:length(modelWithTestDf$p.value)) {
-      modelSampleIntersection <- dataMatrix[i,] & randomData
-      q <- sum(modelSampleIntersection)
-      m <- sum(dataMatrix[i,])
+    randomData <- as.bit.which(sample(length(allElements), size = length(sampleVector)), length(allElements))
+    for (i in 1:length(dataMatrix)) {
+      q <- sum(dataMatrix[[i]] & randomData)
+      m <- sum(dataMatrix[[i]])
       n <- length(allElements) - m
       k <- sum(randomData)
       # Why 1 - pvalue from test?
@@ -77,6 +77,7 @@ gseaPermutationTestWithBinaryMatrix <- function(modelWithTestDf, steps, sampleVe
     }
   }
   simulationVector <- as.vector(simulationMatrix)
+
   R_value_exp <- integer(0)
   for (l in 1:length(modelWithTestDf$p.value)) {
     # Why is 15 digits?
