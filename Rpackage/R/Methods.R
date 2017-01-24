@@ -31,14 +31,10 @@ gseaPermutationTest <- function(modelWithTestDf, steps, sampleVector) {
   for (j in 1:steps) {
     randomData <- sample(allElements, length(sampleVector))
     for (i in 1:length(modelWithTestDf$p.value)) {
-      concatenatedListOfValues <- c(modelWithTestDf[i, 'listOfValues'][[1]], randomData)
-      modelSampleIntersection <- concatenatedListOfValues[duplicated(concatenatedListOfValues)]
-      q <- length(modelSampleIntersection)
+      q <- sum(duplicated(c(modelWithTestDf[i, 'listOfValues'][[1]], randomData)))
       m <- length(modelWithTestDf[i, 'listOfValues'][[1]])
-      modelAllElementsIntersectionLength <- sum(duplicated(c(modelWithTestDf[i, 'listOfValues'][[1]], allElements)))
-      n <- length(allElements) - modelAllElementsIntersectionLength
+      n <- length(allElements) - m
       k <- length(randomData)
-
       # Why 1 - pvalue from test?
       simulationMatrix[i,j] = 1 - phyper(q, m, n, k, lower.tail = FALSE, log.p = FALSE)
     }
@@ -73,8 +69,8 @@ gseaPermutationTestWithBinaryMatrix <- function(modelWithTestDf, steps, sampleVe
     for (i in 1:length(modelWithTestDf$p.value)) {
       modelSampleIntersection <- dataMatrix[i,] & randomData
       q <- sum(modelSampleIntersection)
-      m <- length(modelWithTestDf[i, 'listOfValues'][[1]])
-      n <- length(allElements) - sum(dataMatrix[i,])
+      m <- sum(dataMatrix[i,])
+      n <- length(allElements) - m
       k <- sum(randomData)
       # Why 1 - pvalue from test?
       simulationMatrix[i,j] <- 1 - phyper(q, m, n, k, lower.tail = FALSE, log.p = FALSE)
@@ -104,14 +100,10 @@ gseaPermutationTestPlyr <- function(modelWithTestDf, steps, sampleVector) {
   for (j in 1:steps) {
     randomData <- sample(allElements, length(sampleVector))
     simulationVector[k:(k - 1 + w)] <- plyr::daply(.data = modelWithTestDf, .variables = c("category"), .fun = function(dfRow) {
-      concatenatedListOfValues <- c(dfRow$listOfValues[[1]], randomData)
-      modelSampleIntersection <- concatenatedListOfValues[duplicated(concatenatedListOfValues)]
-      q <- length(modelSampleIntersection)
+      q <- sum(duplicated(c(dfRow$listOfValues[[1]], randomData)))
       m <- length(dfRow$listOfValues[[1]])
-      modelAllElementsIntersectionLength <- sum(duplicated(c(dfRow$listOfValues[[1]], allElements)))
-      n <- length(allElements) - modelAllElementsIntersectionLength
+      n <- length(allElements) - m
       k <- length(randomData)
-
       # Why 1 - pvalue from test?
       1 - phyper(q, m, n, k, lower.tail = FALSE, log.p = FALSE)
     })
