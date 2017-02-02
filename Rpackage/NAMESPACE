@@ -1,4 +1,5 @@
 # Imports:
+import(methods)
 import(DBI)
 import(RSQLite)
 import(plyr)
@@ -21,3 +22,6 @@ export(gseaPermutationTest)
 export(gseaPermutationTestPlyr)
 export(gseaPermutationTestWithBinaryMatrix)
 
+exportClasses(muleaData, muleaKolmogorovSmirnovTest, muleaHypergeometricTest, muleaFisherTest, muleaChiSquaredTest)
+
+exportMethods(runTest)

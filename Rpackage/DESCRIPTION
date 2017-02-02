@@ -21,7 +21,9 @@ Imports:
     DBI (>= 0.3.1),
     RSQLite (>= 1.0.0),
     topGO (>= 2.25.0),
-    plyr (>= 1.8.4)
+    plyr (>= 1.8.4),
+    bit (>= 1.1.12),
+    methods (>= 3.3.2)
 Depends:
     R (>= 3.3.0)
 Suggests:
@@ -35,6 +37,8 @@ Collate:
     'LocalDb.R'
     'Gsea.R'
     'Methods.R'
+    'Classes.R'
+    'GenericFunctions.R'
 URL: http://yihui.name/knitr/
 BugReports: https://github.com/yihui/knitr/issues
 #: Descripe package in BioConductor structure

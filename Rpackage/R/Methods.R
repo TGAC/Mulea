@@ -61,12 +61,12 @@ gseaPermutationTestWithBinaryMatrix <- function(modelWithTestDf, steps, sampleVe
   dataMatrix <- list()
   for (i in 1:length(modelWithTestDf$category)) {
     concatenation <- c(modelWithTestDf[i,]$listOfValues[[1]], allElements)
-    dataMatrix <- append(dataMatrix, list(as.bit(duplicated(concatenation)[(length(modelWithTestDf[i,]$listOfValues[[1]])+1):length(concatenation)])))
+    dataMatrix <- append(dataMatrix, list(bit::as.bit(duplicated(concatenation)[(length(modelWithTestDf[i,]$listOfValues[[1]])+1):length(concatenation)])))
   }
 
   simulationMatrix <- array(dim = c(length(modelWithTestDf$p.value), steps))
   for (j in 1:steps) {
-    randomData <- as.bit.which(sample(length(allElements), size = length(sampleVector)), length(allElements))
+    randomData <- bit::as.bit.which(sample(length(allElements), size = length(sampleVector)), length(allElements))
     for (i in 1:length(dataMatrix)) {
       q <- sum(dataMatrix[[i]] & randomData)
       m <- sum(dataMatrix[[i]])

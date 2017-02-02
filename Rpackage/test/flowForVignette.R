@@ -1,5 +1,9 @@
 #Flow for Vignettes:
 
+
+
+##############################Functions################################
+
 #Create SQLite DB on local machine as file or in memory.
 creationOfLocalDB <- MulEA::startLocalDatabase("/home/koralgooll/doktorat/Rpackages/muleaDb/")
 creationOfLocalDB <- MulEA::startLocalDatabase(":memory:")
@@ -7,12 +11,14 @@ creationOfLocalDB <- MulEA::startLocalDatabase(":memory:")
 stopDbResults <- MulEA::stopLocalDatabase()
 
 #Read model from file.
-modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = "/home/koralgooll/R/x86_64-pc-linux-gnu-library/3.3/MulEA/example/model.gmt")
+muleaPkgDir <- find.package("MulEA")
+modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = paste(muleaPkgDir,"/example/model.gmt", sep = ""))
 
 #Add model to database.
 MulEA::addModelToLocalDatabase(model = modelDfFromFile, taxonomy_id = 9001, model_source = "GO", version = 0)
 
 #Get model from local (future: global) database. It is possible in two forms DF and list.
+modelDfFromLocalDB <- modelDfFromFile
 modelDfFromLocalDB <- MulEA::getModelFromLocalDatabaseAsDf(taxonomy_id = 9001, model_source = "GO", version = 0)
 modelListFromLocalDB <- MulEA::getModelFromLocalDatabaseAsList(taxonomy_id = 9001, model_source = "GO", version = 0)
 
@@ -39,3 +45,29 @@ chTestResults <- MulEA::calculateChiSquaredTest(model = modelDfFromLocalDB, samp
 defaultAdjustment <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestResults, sampleVector = dataFromExp)
 gseaAdjustment <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestResults, sampleVector = dataFromExp, steps = 2, adjustMethod = "GSEA")
 bhAdjustment <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestResults, sampleVector = dataFromExp, adjustMethod = "BH")
+
+
+
+##############################Objects################################
+
+#Object approach. :)
+muleaPkgDir <- find.package("MulEA")
+modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = paste(muleaPkgDir,"/example/model.gmt", sep = ""))
+str(modelDfFromFile$listOfValues)
+
+dataFromExperiment <- c("FBgn0004407", "FBgn0010438", "FBgn0003742", "FBgn0029709", "FBgn0030341", "FBgn0037044", "FBgn0002887", "FBgn0028434", "FBgn0030170", "FBgn0263831")
+
+muleaDataObject <- new(Class = "muleaData", model = modelDfFromFile)
+
+muleaKolmogorovSmirnovTestObject <- new("muleaKolmogorovSmirnovTest", samples = dataFromExperiment)
+muleaHypergeometricTestObject <- new("muleaHypergeometricTest", samples = dataFromExperiment)
+muleaFisherTestObject <- new("muleaFisherTest", samples = dataFromExperiment)
+muleaChiSquaredTestObject <- new("muleaChiSquaredTest", sample = dataFromExperiment)
+
+ksTestRes <- MulEA::runTest(muleaDataObject, muleaKolmogorovSmirnovTestObject)
+hTestRes <- MulEA::runTest(muleaDataObject, muleaHypergeometricTestObject)
+fTestRes <- MulEA::runTest(muleaDataObject, muleaFisherTestObject)
+chTestRes <- MulEA::runTest(muleaDataObject, muleaChiSquaredTestObject)
+
+decoratedTestRes <- MulEA::runTest(new(Class = "muleaData", model = hTestRes), muleaKolmogorovSmirnovTestObject)
+
