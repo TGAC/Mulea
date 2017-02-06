@@ -49,7 +49,7 @@ BiocInstaller::biocLite()
 biocLite("BiocCheck")
 library(BiocCheck)
 #Do BiocCheck on development version of package, not installed. :P
-BiocCheck("/home/koralgooll/doktorat/Rpackages/mulea/Mulea")
+BiocCheck("/home/koralgooll/doktorat/Rpackages/Mulea/MulEA/")
 #Not this directory:
 find.package("Mulea")
 # KNOWN BUG

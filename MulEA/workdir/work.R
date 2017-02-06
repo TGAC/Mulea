@@ -132,7 +132,7 @@ b2 <- function() {
 }
 
 cat("\014")
-for (i in c(10, 20, 30)) {
+for (i in c(100)) {
   for (j in c(200)) {
     steps <- i
     sampleVector <- sample(unique(unlist(modelDfFromFile$listOfValues)), j)
