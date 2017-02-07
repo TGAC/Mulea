@@ -38,12 +38,14 @@ dataFromExperiment <- c("FBgn0004407", "FBgn0010438", "FBgn0003742", "FBgn002970
 #Statistical tests.
 gTestResults <- MulEA::calculateGSEATest(model = modelDfFromFile, sampleVector = dataFromExperiment, modelBaseVector = character(0))
 hTestResults <- MulEA::calculateHypergeometricTest(model = modelDfFromLocalDB, sampleVector = dataFromExperiment)
+hTestResultsWithPool <- MulEA::calculateHypergeometricTest(model = modelDfFromLocalDB, sampleVector = dataFromExperiment, poolVector = dataFromExperimentPool)
 fTestResults <- MulEA::calculateFisherTest(model = modelDfFromFile, sampleVector = dataFromExperiment)
 chTestResults <- MulEA::calculateChiSquaredTest(model = modelDfFromLocalDB, sampleVector = dataFromExperiment)
 
 #Adjust P-values for Multiple Comparisons.
 defaultAdjustment <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestResults, sampleVector = dataFromExp)
-gseaAdjustment <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestResults, sampleVector = dataFromExp, steps = 2, adjustMethod = "GSEA")
+gseaAdjustment <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestResults, sampleVector = dataFromExperiment, steps = 2, adjustMethod = "GSEA")
+gseaAdjustmentWithPool <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestResultsWithPool, sampleVector = dataFromExperiment, poolVector = dataFromExperimentPool, steps = 2, adjustMethod = "GSEA")
 bhAdjustment <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestResults, sampleVector = dataFromExp, adjustMethod = "BH")
 
 
@@ -55,19 +57,34 @@ muleaPkgDir <- find.package("MulEA")
 modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = paste(muleaPkgDir,"/example/model.gmt", sep = ""))
 str(modelDfFromFile$listOfValues)
 
+dataFromExperimentPool <- unique(c(unlist(muleaDataObject@model$listOfValues), c("FBgn0066666", "FBgn0000000", "FBgn0099999", "FBgn0011111", "FBgn0022222", "FBgn0777777", "FBgn0333333", "FBgn0003742", "FBgn0029709", "FBgn0030341")))
 dataFromExperiment <- c("FBgn0004407", "FBgn0010438", "FBgn0003742", "FBgn0029709", "FBgn0030341", "FBgn0037044", "FBgn0002887", "FBgn0028434", "FBgn0030170", "FBgn0263831")
+dataFromExperimentScores <- c(0.09, 0.11, 0.15, 0.20, 0.21, 0.24, 0.28, 0.30, 0.45, 0.50)
 
 muleaDataObject <- new(Class = "muleaData", model = modelDfFromFile)
 
 muleaKolmogorovSmirnovTestObject <- new("muleaKolmogorovSmirnovTest", samples = dataFromExperiment)
+muleaKolmogorovSmirnovWithRanksTestObject <- new("muleaKolmogorovSmirnovWithRanksTest", samples = dataFromExperiment, scores = dataFromExperimentScores, p = 3, numberOfPermutations = 10000)
+
 muleaHypergeometricTestObject <- new("muleaHypergeometricTest", samples = dataFromExperiment)
+muleaHypergeometricTestObjectWithPool <- new("muleaHypergeometricTest", samples = dataFromExperiment, pool = dataFromExperimentPool)
 muleaFisherTestObject <- new("muleaFisherTest", samples = dataFromExperiment)
 muleaChiSquaredTestObject <- new("muleaChiSquaredTest", sample = dataFromExperiment)
 
 ksTestRes <- MulEA::runTest(muleaDataObject, muleaKolmogorovSmirnovTestObject)
+ksWithRankTestRes <- MulEA::runTest(muleaDataObject, muleaKolmogorovSmirnovWithRanksTestObject)
 hTestRes <- MulEA::runTest(muleaDataObject, muleaHypergeometricTestObject)
+hTestResWithPool <- MulEA::runTest(muleaDataObject, muleaHypergeometricTestObjectWithPool)
 fTestRes <- MulEA::runTest(muleaDataObject, muleaFisherTestObject)
 chTestRes <- MulEA::runTest(muleaDataObject, muleaChiSquaredTestObject)
 
+
+gseaAdjustment <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestResults, sampleVector = dataFromExperiment,
+                                                             steps = 2, adjustMethod = "GSEA")
+gseaAdjustmentWithPool <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestResultsWithPool, sampleVector = dataFromExperiment,
+                                                                     poolVector = dataFromExperimentPool, steps = 2, adjustMethod = "GSEA")
+
+
 decoratedTestRes <- MulEA::runTest(new(Class = "muleaData", model = hTestRes), muleaKolmogorovSmirnovTestObject)
+
 
