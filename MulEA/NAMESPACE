@@ -3,6 +3,7 @@ import(methods)
 import(DBI)
 import(RSQLite)
 import(plyr)
+import(topGO)
 # Exports:
 export(readGmtFileAsDF)
 export(startLocalDatabase)

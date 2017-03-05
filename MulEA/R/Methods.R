@@ -2,19 +2,22 @@ calculateHypergeometricTest <- function(model, sampleVector) {
     allElements <- unique(unlist(model$listOfValues))
     testResults <- ddply(.data = model,  .variables = c("category"), .fun = function(dfRow) {
         modelSampleIntersection <- intersect(dfRow[1, 'listOfValues'][[1]], sampleVector)
-        q <- length(modelSampleIntersection)
-        m <- length(dfRow[1, 'listOfValues'][[1]])
-        n <- length(setdiff(allElements, dfRow[1, 'listOfValues'][[1]]))
-        k <- length(sampleVector)
+        selectedAndInGroup <- length(modelSampleIntersection)
+        selectedAndOutOfGroup <- length(setdiff(sampleVector, modelSampleIntersection))
+        outOfSelectionAndInGroup <- length(setdiff(dfRow[1, 'listOfValues'][[1]], sampleVector))
+        outOfSelectionAndOutOfGroup <- length(setdiff(allElements, union(sampleVector, dfRow[1, 'listOfValues'][[1]])))
         data <- data.frame(
             'description' = dfRow['description'],
             'listOfValues' = dfRow["listOfValues"],
             'listOfValuesUnderCategory' = I(list(modelSampleIntersection)),
-            'q' = q,
-            'm' = m,
-            'n' = n,
-            'k' = k,
-            'p-value' = phyper(q, m, n, k, lower.tail = FALSE, log.p = FALSE))
+            'q' = selectedAndInGroup,
+            'm' = selectedAndInGroup + outOfSelectionAndInGroup,
+            'n' = selectedAndOutOfGroup + outOfSelectionAndOutOfGroup,
+            'k' = selectedAndInGroup + selectedAndOutOfGroup,
+            'p-value' = phyper(selectedAndInGroup,
+                               selectedAndInGroup + outOfSelectionAndInGroup,
+                               selectedAndOutOfGroup + outOfSelectionAndOutOfGroup,
+                               selectedAndInGroup + selectedAndOutOfGroup, lower.tail = TRUE))
     })
     testResults
 }
@@ -131,29 +134,31 @@ adjustPvaluesForMultipleComparisons <- function(modelWithTestsResults, sampleVec
 }
 
 
-calculateTestOnContingencyTable <- function(testMethod) {
+calculateTestOnContingencyTable <- function(testMethod, ...) {
   function(model, sampleVector) {
     allElements <- unique(unlist(model$listOfValues))
     testResults <- ddply(.data = model,  .variables = c("category"), .fun = function(dfRow) {
       modelSampleIntersection <- intersect(dfRow[1, 'listOfValues'][[1]], sampleVector)
-      q <- length(modelSampleIntersection)
-      m <- length(dfRow[1, 'listOfValues'][[1]])
-      n <- length(setdiff(allElements, dfRow[1, 'listOfValues'][[1]]))
-      k <- length(setdiff(sampleVector, modelSampleIntersection))
+      selectedAndInGroup <- length(modelSampleIntersection)
+      selectedAndOutOfGroup <- length(setdiff(sampleVector, modelSampleIntersection))
+      outOfSelectionAndInGroup <- length(setdiff(dfRow[1, 'listOfValues'][[1]], sampleVector))
+      outOfSelectionAndOutOfGroup <- length(setdiff(allElements, union(sampleVector, dfRow[1, 'listOfValues'][[1]])))
+      contingencyTable <- matrix(c(selectedAndInGroup,
+                                   selectedAndOutOfGroup,
+                                   outOfSelectionAndInGroup,
+                                   outOfSelectionAndOutOfGroup),
+                                 2, 2)
       data <- data.frame(
         'description' = dfRow['description'],
         'listOfValues' = dfRow["listOfValues"],
         'listOfValuesUnderCategory' = I(list(modelSampleIntersection)),
-        'q' = q,
-        'm' = m,
-        'n' = n,
-        'k' = k,
-        'testResultsColumnName' = I(list(testMethod(matrix(c(m, q, n, k), nrow = 2)))))
+        'contingencyTable' = I(list(contingencyTable)),
+        'testResultsColumnName' = I(list(testMethod(contingencyTable, ...))))
     })
     testResults
   }
 }
 
-calculateFisherTest <- calculateTestOnContingencyTable(fisher.test)
+calculateFisherTest <- calculateTestOnContingencyTable(fisher.test, alternative = 'less')
 
 calculateChiSquaredTest <- calculateTestOnContingencyTable(chisq.test)
