@@ -87,22 +87,70 @@ setMethod("initialize", "muleaKolmogorovSmirnovTest",
           })
 
 
+setClass("muleaKolmogorovSmirnovWithRanksTest",
+         slots = list(
+           samples = "character",
+           scores = "numeric",
+           test = "function",
+           p = "numeric",
+           numberOfPermutations = "numeric"
+         ))
+
+setMethod("initialize", "muleaKolmogorovSmirnovWithRanksTest",
+          function(.Object,
+                   samples = character(),
+                   scores = numeric(),
+                   p = 1,
+                   test = NULL,
+                   numberOfPermutations = 1000,
+                   ...) {
+
+            .Object@samples <- samples
+            .Object@scores <- scores
+            .Object@p <- p
+            .Object@numberOfPermutations <- numberOfPermutations
+
+            .Object@test <- function(dataObject, testObject) {
+
+              listmodelDfFromFile <- dataObject@model$listOfValues
+              names(listmodelDfFromFile) <- dataObject@model$category
+
+              samplesToAnalisys <- testObject@scores
+              names(samplesToAnalisys) <- testObject@samples
+
+              fgseaRes <- fgsea(pathways = listmodelDfFromFile,
+                                              stats = samplesToAnalisys,
+                                              gseaParam = testObject@p, nperm = testObject@numberOfPermutations)
+
+              resultDf <- merge(dataObject@model, fgseaRes, by.x = "category", by.y = "pathway", all = TRUE)[c("category", "description", "listOfValues", "pval")]
+              resultDf
+
+            }
+
+            .Object
+
+          })
+
+
 setClass("muleaHypergeometricTest",
          slots = list(
            samples = "character",
+           pool = "character",
            test = "function"
          ))
 
 setMethod("initialize", "muleaHypergeometricTest",
           function(.Object,
                    samples = character(),
+                   pool = character(),
                    test = NULL,
                    ...) {
 
             .Object@samples <- samples
+            .Object@pool <- pool
 
             .Object@test <- function(dataObject, testObject) {
-              MulEA::calculateHypergeometricTest(model = dataObject@model, sampleVector = testObject@samples)
+              MulEA::calculateHypergeometricTest(model = dataObject@model, sampleVector = testObject@samples, poolVector = testObject@pool)
             }
 
             .Object

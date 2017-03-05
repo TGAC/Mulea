@@ -4,6 +4,7 @@ import(DBI)
 import(RSQLite)
 import(plyr)
 import(topGO)
+import(fgsea)
 # Exports:
 export(readGmtFileAsDF)
 export(startLocalDatabase)

@@ -23,7 +23,8 @@ Imports:
     topGO (>= 2.25.0),
     plyr (>= 1.8.4),
     bit (>= 1.1.12),
-    methods (>= 3.3.2)
+    methods (>= 3.3.2),
+    fgsea (>= 1.0.2)
 Depends:
     R (>= 3.3.0)
 Suggests:

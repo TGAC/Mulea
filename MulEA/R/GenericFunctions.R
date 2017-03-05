@@ -12,6 +12,14 @@ setMethod("runTest",
           })
 
 setMethod("runTest",
+          signature(dataObject = "muleaData", testObject = "muleaKolmogorovSmirnovWithRanksTest"),
+          function(dataObject, testObject) {
+
+            testObject@test(dataObject, testObject)
+
+          })
+
+setMethod("runTest",
           signature(dataObject = "muleaData", testObject = "muleaHypergeometricTest"),
           function(dataObject, testObject) {
 

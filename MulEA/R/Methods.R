@@ -1,4 +1,40 @@
-calculateHypergeometricTest <- function(model, sampleVector) {
+calculateHypergeometricTest <- function(model, sampleVector, poolVector = NULL) {
+
+  if (0 != length(poolVector)) {
+    if (0 != sum(!(sampleVector %in% poolVector))) {
+      warning("Samples are outside of pool.")
+    }
+    allElements <- unique(poolVector)
+    testResults <- ddply(.data = model,  .variables = c("category"), .fun = function(dfRow) {
+
+      poolAndSelectedAndDBiIntersection <- Reduce(intersect, list(allElements, sampleVector, dfRow[1, 'listOfValues'][[1]]))
+      modelPoolIntersection <- intersect(dfRow[1, 'listOfValues'][[1]], allElements)
+
+      selectedAndInGroup <- length(poolAndSelectedAndDBiIntersection)
+      selectedAndOutOfGroup <- length(setdiff(sampleVector, poolAndSelectedAndDBiIntersection))
+      outOfSelectionAndInGroup <- length(setdiff(modelPoolIntersection, sampleVector))
+      outOfSelectionAndOutOfGroup <- length(setdiff(allElements, union(sampleVector, dfRow[1, 'listOfValues'][[1]])))
+
+      # q <- length(modelSampleIntersection)
+      # m <- length(modelPoolIntersection)
+      # n <- length(setdiff(allElements, dfRow[1, 'listOfValues'][[1]]))
+      # k <- length(sampleVector)
+
+      data <- data.frame(
+        'description' = dfRow['description'],
+        'listOfValues' = dfRow["listOfValues"],
+        'listOfValuesUnderCategory' = I(list(modelSampleIntersection)),
+        'q' = selectedAndInGroup,
+        'm' = selectedAndInGroup + outOfSelectionAndInGroup,
+        'n' = selectedAndOutOfGroup + outOfSelectionAndOutOfGroup,
+        'k' = selectedAndInGroup + selectedAndOutOfGroup,
+        'p-value' = phyper(selectedAndInGroup,
+                           selectedAndInGroup + outOfSelectionAndInGroup,
+                           selectedAndOutOfGroup + outOfSelectionAndOutOfGroup,
+                           selectedAndInGroup + selectedAndOutOfGroup, lower.tail = TRUE))
+
+    })
+  } else {
     allElements <- unique(unlist(model$listOfValues))
     testResults <- ddply(.data = model,  .variables = c("category"), .fun = function(dfRow) {
         modelSampleIntersection <- intersect(dfRow[1, 'listOfValues'][[1]], sampleVector)
@@ -19,30 +55,58 @@ calculateHypergeometricTest <- function(model, sampleVector) {
                                selectedAndOutOfGroup + outOfSelectionAndOutOfGroup,
                                selectedAndInGroup + selectedAndOutOfGroup, lower.tail = TRUE))
     })
-    testResults
+  }
+  testResults
 }
 
 
-gseaPermutationTest <- function(modelWithTestDf, steps, sampleVector) {
+gseaPermutationTest <- function(modelWithTestDf, steps, sampleVector, poolVector = character(0)) {
   R_value_obs <- integer(0)
   for (i in 1:length(modelWithTestDf$p.value)) {
     R_value_obs[i] <- sum(modelWithTestDf$p.value <= modelWithTestDf$p.value[i])
   }
 
-  allElements <- unique(unlist(modelWithTestDf$listOfValues))
-  simulationMatrix <- array(dim = c(length(modelWithTestDf$p.value), steps))
-  for (j in 1:steps) {
-    randomData <- sample(allElements, length(sampleVector))
-    for (i in 1:length(modelWithTestDf$p.value)) {
-      q <- sum(duplicated(c(modelWithTestDf[i, 'listOfValues'][[1]], randomData)))
-      m <- length(modelWithTestDf[i, 'listOfValues'][[1]])
-      n <- length(allElements) - m
-      k <- length(randomData)
-      # Why 1 - pvalue from test?
-      simulationMatrix[i,j] = 1 - phyper(q, m, n, k, lower.tail = FALSE, log.p = FALSE)
+  if (0 != length(poolVector)) {
+    if (0 != sum(!(sampleVector %in% poolVector))) {
+      warning("Samples are outside of pool.")
+    }
+
+    allElements <- unique(poolVector)
+    simulationMatrix <- array(dim = c(length(modelWithTestDf$p.value), steps))
+    for (j in 1:steps) {
+      randomData <- sample(allElements, length(sampleVector))
+      for (i in 1:length(modelWithTestDf$p.value)) {
+
+        q <- sum(duplicated(c(modelWithTestDf[i, 'listOfValues'][[1]], randomData)))
+        m <- sum(duplicated(c(modelWithTestDf[i, 'listOfValues'][[1]], allElements)))
+        n <- length(allElements) - m
+        k <- length(randomData)
+
+        # Why 1 - pvalue from test?
+        simulationMatrix[i,j] = 1 - phyper(q, m, n, k, lower.tail = FALSE, log.p = FALSE)
+      }
+    }
+  } else {
+    allElements <- unique(unlist(modelWithTestDf$listOfValues))
+    simulationMatrix <- array(dim = c(length(modelWithTestDf$p.value), steps))
+    for (j in 1:steps) {
+      randomData <- sample(allElements, length(sampleVector))
+      for (i in 1:length(modelWithTestDf$p.value)) {
+
+        q <- sum(duplicated(c(modelWithTestDf[i, 'listOfValues'][[1]], randomData)))
+        m <- length(modelWithTestDf[i, 'listOfValues'][[1]])
+        n <- length(allElements) - m
+        k <- length(randomData)
+
+        # Why 1 - pvalue from test?
+        simulationMatrix[i,j] = 1 - phyper(q, m, n, k, lower.tail = FALSE, log.p = FALSE)
+      }
     }
   }
+
   simulationVector <- as.vector(simulationMatrix)
+
+
 
   R_value_exp <- integer(0)
   for (l in 1:length(modelWithTestDf$p.value)) {
@@ -50,7 +114,7 @@ gseaPermutationTest <- function(modelWithTestDf, steps, sampleVector) {
     # P_Sim_round=round(P_Sim_vec, digits=15)
     R_value_exp[l] <- sum(simulationVector <= modelWithTestDf$p.value[l]) / steps
   }
-  gseaPermutationTestVector <- round(R_value_exp / R_value_obs, digits = 4)
+  gseaPermutationTestVector <- round(R_value_exp / R_value_obs, digits = 10)
   gseaPermutationTestVector
 }
 
@@ -124,9 +188,9 @@ gseaPermutationTestPlyr <- function(modelWithTestDf, steps, sampleVector) {
 }
 
 
-adjustPvaluesForMultipleComparisons <- function(modelWithTestsResults, sampleVector, adjustMethod = "bonferroni", steps = 1) {
+adjustPvaluesForMultipleComparisons <- function(modelWithTestsResults, sampleVector, poolVector = character(0), adjustMethod = "bonferroni", steps = 1) {
   if (adjustMethod == "GSEA") {
-    adjustResult <- data.frame(modelWithTestsResults, "controllingProcedures" = gseaPermutationTest(modelWithTestDf = modelWithTestsResults, steps = steps, sampleVector = sampleVector))
+    adjustResult <- data.frame(modelWithTestsResults, "controllingProcedures" = gseaPermutationTest(modelWithTestDf = modelWithTestsResults, steps = steps, sampleVector = sampleVector, poolVector = poolVector))
   } else {
     adjustResult <- data.frame(modelWithTestsResults, "controllingProcedures" = p.adjust(modelWithTestsResults$p.value, method = adjustMethod))
   }
