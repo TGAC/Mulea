@@ -12,7 +12,7 @@ setMethod("runTest",
           })
 
 setMethod("runTest",
-          signature(dataObject = "muleaData", testObject = "muleaKolmogorovSmirnovWithRanksTest"),
+          signature(dataObject = "muleaData", testObject = "rankedGseaTest"),
           function(dataObject, testObject) {
 
             testObject@test(dataObject, testObject)

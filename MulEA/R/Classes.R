@@ -2,21 +2,21 @@
 
 setClass("muleaData",
          slots = list(
-           model = "data.frame",
-           taxonomyId = "character",
-           modelSource = "character",
+           gmt = "data.frame",
+           taxID = "character",
+           ontologyName = "character",
            version = "character",
            scientificName = "character",
            commonEnglishName = "character",
            description = "character",
-           modelBinaryMatrix = "data.frame"
+           modelBinaryMatrix = "data.frame" #TODO : this will be removed, privat
          ))
 
 setMethod("initialize", "muleaData",
           function(.Object,
-                   model = data.frame(),
-                   taxonomyId = character(),
-                   modelSource = character(),
+                   gmt = data.frame(),
+                   taxID = character(),
+                   ontologyName = character(),
                    version = character(),
                    scientificName = character(),
                    commonEnglishName = character(),
@@ -25,9 +25,9 @@ setMethod("initialize", "muleaData",
                    modelBinaryMatrix = data.frame(),
                    ...) {
 
-            .Object@model <- model
-            .Object@taxonomyId <- taxonomyId
-            .Object@modelSource <- modelSource
+            .Object@gmt <- gmt
+            .Object@taxID <- taxID
+            .Object@ontologyName <- ontologyName
             .Object@version <- version
             .Object@scientificName <- scientificName
             .Object@commonEnglishName <- commonEnglishName
@@ -43,41 +43,38 @@ setMethod("initialize", "muleaData",
 
 setClass("muleaKolmogorovSmirnovTest",
          slots = list(
-           samples = "character",
-           scores = "numeric",
+           testData = "character",
            test = "function"
          ))
 
 setMethod("initialize", "muleaKolmogorovSmirnovTest",
           function(.Object,
-                   samples = character(),
-                   scores = numeric(),
+                   testData = character(),
                    test = NULL,
                    ...) {
 
-            .Object@samples <- samples
-            .Object@scores <- scores
+            .Object@testData <- testData
 
             .Object@test <- function(dataObject, testObject) {
 
-              pvalues <- sapply(dataObject@model$listOfValues,
+              pvalues <- sapply(dataObject@gmt$listOfValues,
                                 function(categoryValues) {
-                                  N <- length(testObject@samples)
+                                  N <- length(testObject@testData)
                                   na <- length(categoryValues)
                                   if(na == 0 || na == N)
                                     return(1)
-                                  a <- match(categoryValues, testObject@samples)
+                                  a <- match(categoryValues, testObject@testData)
                                   # a <- x.a[!is.na(x.a)]
                                   a <- a[!is.na(a)]
-                                  if(length(a) == 0)
+                                  if ( length(a) == 0 ) {
                                     return(1)
-
+                                  }
                                   # return(ks.test(a, seq_len(N)[-a], alternative = "greater")$p.value)
                                   ks.test(a, seq_len(N)[-a])$p.value
 
                                 })
 
-              resultDf <- data.frame(dataObject@model, pvalues)
+              resultDf <- data.frame(dataObject@gmt, pvalues)
               resultDf
 
             }
@@ -87,42 +84,42 @@ setMethod("initialize", "muleaKolmogorovSmirnovTest",
           })
 
 
-setClass("muleaKolmogorovSmirnovWithRanksTest",
+setClass("rankedGseaTest",
          slots = list(
-           samples = "character",
+           testData = "character",
            scores = "numeric",
            test = "function",
            p = "numeric",
            numberOfPermutations = "numeric"
          ))
 
-setMethod("initialize", "muleaKolmogorovSmirnovWithRanksTest",
+setMethod("initialize", "rankedGseaTest",
           function(.Object,
-                   samples = character(),
+                   testData = character(),
                    scores = numeric(),
                    p = 1,
                    test = NULL,
                    numberOfPermutations = 1000,
                    ...) {
 
-            .Object@samples <- samples
+            .Object@testData <- testData
             .Object@scores <- scores
             .Object@p <- p
             .Object@numberOfPermutations <- numberOfPermutations
 
             .Object@test <- function(dataObject, testObject) {
 
-              listmodelDfFromFile <- dataObject@model$listOfValues
-              names(listmodelDfFromFile) <- dataObject@model$category
+              listmodelDfFromFile <- dataObject@gmt$listOfValues
+              names(listmodelDfFromFile) <- dataObject@gmt$category
 
               samplesToAnalisys <- testObject@scores
-              names(samplesToAnalisys) <- testObject@samples
+              names(samplesToAnalisys) <- testObject@testData
 
               fgseaRes <- fgsea(pathways = listmodelDfFromFile,
                                               stats = samplesToAnalisys,
                                               gseaParam = testObject@p, nperm = testObject@numberOfPermutations)
 
-              resultDf <- merge(dataObject@model, fgseaRes, by.x = "category", by.y = "pathway", all = TRUE)[c("category", "description", "listOfValues", "pval")]
+              resultDf <- merge(dataObject@gmt, fgseaRes, by.x = "category", by.y = "pathway", all = TRUE)[c("category", "description", "listOfValues", "pval")]
               resultDf
 
             }
@@ -134,23 +131,23 @@ setMethod("initialize", "muleaKolmogorovSmirnovWithRanksTest",
 
 setClass("muleaHypergeometricTest",
          slots = list(
-           samples = "character",
+           testData = "character",
            pool = "character",
            test = "function"
          ))
 
 setMethod("initialize", "muleaHypergeometricTest",
           function(.Object,
-                   samples = character(),
+                   testData = character(),
                    pool = character(),
                    test = NULL,
                    ...) {
 
-            .Object@samples <- samples
+            .Object@testData <- testData
             .Object@pool <- pool
 
             .Object@test <- function(dataObject, testObject) {
-              MulEA::calculateHypergeometricTest(model = dataObject@model, sampleVector = testObject@samples, poolVector = testObject@pool)
+              MulEA::calculateHypergeometricTest(model = dataObject@gmt, sampleVector = testObject@testData, poolVector = testObject@pool)
             }
 
             .Object
@@ -159,20 +156,20 @@ setMethod("initialize", "muleaHypergeometricTest",
 
 setClass("muleaFisherTest",
          slots = list(
-           samples = "character",
+           testData = "character",
            test = "function"
          ))
 
 setMethod("initialize", "muleaFisherTest",
           function(.Object,
-                   samples = character(),
+                   testData = character(),
                    test = NULL,
                    ...) {
 
-            .Object@samples <- samples
+            .Object@testData <- testData
 
             .Object@test <- function(dataObject, testObject) {
-              MulEA::calculateFisherTest(model = dataObject@model, sampleVector = testObject@samples)
+              MulEA::calculateFisherTest(model = dataObject@gmt, sampleVector = testObject@testData)
             }
 
             .Object
@@ -182,20 +179,20 @@ setMethod("initialize", "muleaFisherTest",
 
 setClass("muleaChiSquaredTest",
          slots = list(
-           samples = "character",
+           testData = "character",
            test = "function"
          ))
 
 setMethod("initialize", "muleaChiSquaredTest",
           function(.Object,
-                   samples = character(),
+                   testData = character(),
                    test = NULL,
                    ...) {
 
-            .Object@samples <- samples
+            .Object@testData <- testData
 
             .Object@test <- function(dataObject, testObject) {
-              MulEA::calculateChiSquaredTest(model = dataObject@model, sampleVector = testObject@samples)
+              MulEA::calculateChiSquaredTest(model = dataObject@gmt, sampleVector = testObject@testData)
             }
 
             .Object
