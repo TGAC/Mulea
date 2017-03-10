@@ -1,9 +1,20 @@
 calculateHypergeometricTest <- function(model, sampleVector, poolVector = NULL) {
-
+  # Chcking if experiment data all in model data.
   if (0 != length(poolVector)) {
     if (0 != sum(!(sampleVector %in% poolVector))) {
-      warning("Samples are outside of pool.")
+      warning("testData are outside of pool.", " ",
+              paste(setdiff(sampleVector, unique(unlist(model$listOfValues))), collapse = ", "))
+      return(NA)
     }
+  } else {
+    if (0 != sum(!(sampleVector %in% unique(unlist(model$listOfValues))))) {
+      warning("testData are outside of gmt.", " ",
+              paste(setdiff(sampleVector, unique(unlist(model$listOfValues))), collapse = ", "))
+      return(NA)
+    }
+  }
+
+  if (0 != length(poolVector)) {
     allElements <- unique(poolVector)
     testResults <- ddply(.data = model,  .variables = c("category"), .fun = function(dfRow) {
       poolAndSelectedAndDBiIntersection <- Reduce(intersect, list(allElements, sampleVector, dfRow[1, 'listOfValues'][[1]]))
@@ -175,14 +186,45 @@ adjustPvaluesForMultipleComparisons <- function(modelWithTestsResults, sampleVec
 
 
 calculateTestOnContingencyTable <- function(testMethod, ...) {
-  function(model, sampleVector) {
-    allElements <- unique(unlist(model$listOfValues))
+  function(model, sampleVector, poolVector = NULL) {
+    # Chcking if experiment data all in model data.
+    if (0 != length(poolVector)) {
+      if (0 != sum(!(sampleVector %in% poolVector))) {
+        warning("testData are outside of pool.", " ",
+                paste(setdiff(sampleVector, unique(unlist(model$listOfValues))), collapse = ", "))
+        return(NA)
+      }
+    } else {
+      if (0 != sum(!(sampleVector %in% unique(unlist(model$listOfValues))))) {
+        warning("testData are outside of gmt.", " ",
+                paste(setdiff(sampleVector, unique(unlist(model$listOfValues))), collapse = ", "))
+        return(NA)
+      }
+    }
+
+    if (0 != length(poolVector)) {
+      allElements <- unique(poolVector)
+    } else {
+      allElements <- unique(unlist(model$listOfValues))
+    }
     testResults <- ddply(.data = model,  .variables = c("category"), .fun = function(dfRow) {
-      modelSampleIntersection <- intersect(dfRow[1, 'listOfValues'][[1]], sampleVector)
-      selectedAndInGroup <- length(modelSampleIntersection)
-      selectedAndOutOfGroup <- length(setdiff(sampleVector, modelSampleIntersection))
-      outOfSelectionAndInGroup <- length(setdiff(dfRow[1, 'listOfValues'][[1]], sampleVector))
-      outOfSelectionAndOutOfGroup <- length(setdiff(allElements, union(sampleVector, dfRow[1, 'listOfValues'][[1]])))
+
+      if (0 != length(poolVector)) {
+        listOfValuesUnderCategory <- modelSampleIntersection <- intersect(dfRow[1, 'listOfValues'][[1]], sampleVector)
+        selectedAndInGroup <- length(modelSampleIntersection)
+        selectedAndOutOfGroup <- length(setdiff(sampleVector, modelSampleIntersection))
+        outOfSelectionAndInGroup <- length(setdiff(dfRow[1, 'listOfValues'][[1]], sampleVector))
+        outOfSelectionAndOutOfGroup <- length(setdiff(allElements, union(sampleVector, dfRow[1, 'listOfValues'][[1]])))
+      } else {
+        listOfValuesUnderCategory <- poolAndSelectedAndDBiIntersection <- Reduce(intersect, list(allElements, sampleVector, dfRow[1, 'listOfValues'][[1]]))
+        modelPoolIntersection <- intersect(dfRow[1, 'listOfValues'][[1]], allElements)
+
+        selectedAndInGroup <- length(poolAndSelectedAndDBiIntersection)
+        selectedAndOutOfGroup <- length(setdiff(sampleVector, poolAndSelectedAndDBiIntersection))
+        outOfSelectionAndInGroup <- length(setdiff(modelPoolIntersection, sampleVector))
+        outOfSelectionAndOutOfGroup <- length(setdiff(allElements, union(sampleVector, dfRow[1, 'listOfValues'][[1]])))
+      }
+
       contingencyTable <- matrix(c(selectedAndInGroup,
                                    selectedAndOutOfGroup,
                                    outOfSelectionAndInGroup,
@@ -191,7 +233,7 @@ calculateTestOnContingencyTable <- function(testMethod, ...) {
       data <- data.frame(
         'description' = dfRow['description'],
         'listOfValues' = dfRow["listOfValues"],
-        'listOfValuesUnderCategory' = I(list(modelSampleIntersection)),
+        'listOfValuesUnderCategory' = I(list(listOfValuesUnderCategory)),
         'contingencyTable' = I(list(contingencyTable)),
         'testResultsColumnName' = I(list(testMethod(contingencyTable, ...))))
     })

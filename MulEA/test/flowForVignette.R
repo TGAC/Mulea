@@ -58,18 +58,19 @@ modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = paste(muleaPkgDir,"/exam
 str(modelDfFromFile$listOfValues)
 
 dataFromExperimentPool <- unique(c(unlist(muleaDataObject@gmt$listOfValues), c("FBgn0066666", "FBgn0000000", "FBgn0099999", "FBgn0011111", "FBgn0022222", "FBgn0777777", "FBgn0333333", "FBgn0003742", "FBgn0029709", "FBgn0030341")))
-dataFromExperiment <- c("FBgn0004407", "FBgn0010438", "FBgn0003742", "FBgn0029709", "FBgn0030341", "FBgn0037044", "FBgn0002887", "FBgn0028434", "FBgn0030170", "FBgn0263831")
+dataFromExperimentF <- c("FBgn0004407", "FBgn0010438", "FBgn0003742", "FBgn0029709", "FBgn0030341", "FBgn0037044", "FBgn0002887", "FBgn0028434", "FBgn0030170", "FBgn0263831")
+dataFromExperimentT <- c("FBgn0004407", "FBgn0010438", "FBgn0037044", "FBgn0002887", "FBgn0028434", "FBgn0030170", "FBgn0263831")
 dataFromExperimentScores <- c(0.09, 0.11, 0.15, 0.20, 0.21, 0.24, 0.28, 0.30, 0.45, 0.50)
 
 muleaDataObject <- new(Class = "muleaData", gmt = modelDfFromFile)
 
-muleaKolmogorovSmirnovTestObject <- new("muleaKolmogorovSmirnovTest", samples = dataFromExperiment)
-rankedGseaTestObject <- new("rankedGseaTest", samples = dataFromExperiment, scores = dataFromExperimentScores, p = 3, numberOfPermutations = 10000)
+muleaKolmogorovSmirnovTestObject <- new("muleaKolmogorovSmirnovTest", testData = dataFromExperiment)
+rankedGseaTestObject <- new("rankedGseaTest", testData = dataFromExperiment, scores = dataFromExperimentScores, p = 3, numberOfPermutations = 10000)
 
-muleaHypergeometricTestObject <- new("muleaHypergeometricTest", samples = dataFromExperiment)
-muleaHypergeometricTestObjectWithPool <- new("muleaHypergeometricTest", samples = dataFromExperiment, pool = dataFromExperimentPool)
-muleaFisherTestObject <- new("muleaFisherTest", samples = dataFromExperiment)
-muleaChiSquaredTestObject <- new("muleaChiSquaredTest", sample = dataFromExperiment)
+muleaHypergeometricTestObject <- new("muleaHypergeometricTest", testData = dataFromExperimentT)
+muleaHypergeometricTestObjectWithPool <- new("muleaHypergeometricTest", testData = dataFromExperimentT, pool = dataFromExperimentPool)
+muleaFisherTestObject <- new("muleaFisherTest", testData = dataFromExperimentT)
+muleaChiSquaredTestObject <- new("muleaChiSquaredTest", testData = dataFromExperiment)
 
 ksTestRes <- MulEA::runTest(muleaDataObject, muleaKolmogorovSmirnovTestObject)
 ksWithRankTestRes <- MulEA::runTest(muleaDataObject, rankedGseaTestObject)
