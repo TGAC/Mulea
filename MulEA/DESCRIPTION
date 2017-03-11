@@ -1,14 +1,9 @@
-#: TODO : Type not set fields.
-#: DESCRIPTION uses a simple file format called DCF, the Debian control format.
-#: TODO : Check all licenses of packages which we use in Mulea.
+#: #: https://www.bioconductor.org/packages/devel/BiocViews.html#___Software
 Package: MulEA
 Type: Package
 Title: What the Package Does (Title Case)
-#: TODO : <major>.<minor>.<patch>.<dev >= 9000>
 Version: 0.99.0
 Date: 2016-04-08
-#: Roles list: http://www.loc.gov/marc/relators/relaterm.html
-#: TODO : More people with roles, chack roles.
 Authors@R: c(
     person("Wiktor", "Jurkowski", email = "Wiktor.Jurkowski@tgac.ac.uk", role = "aut"),
     person("Eszter", "Ari", email = "arieszter@gmail.com", role = c("aut", "cph")),
@@ -29,21 +24,26 @@ Depends:
     R (>= 3.3.0)
 Suggests:
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat
 VignetteBuilder: knitr
-LinkingTo:
+LinkingTo: 
 Collate:
     'Mulea.R'
     'Utils.R'
     'LocalDb.R'
     'Gsea.R'
     'Methods.R'
+    'MuleaData.R'
+    'HypergeometricTest.R'
+    'FisherTest.R'
+    'ChiSquaredTest.R'
+    'KolmogorovSmirnovTest.R'
+    'GseaTest.R'
     'Classes.R'
     'GenericFunctions.R'
 URL: http://yihui.name/knitr/
 BugReports: https://github.com/yihui/knitr/issues
-#: Descripe package in BioConductor structure
-#: https://www.bioconductor.org/packages/devel/BiocViews.html#___Software
 biocViews:
     BiomedicalInformatics,
     GeneSetEnrichment
