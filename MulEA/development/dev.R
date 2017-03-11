@@ -65,3 +65,8 @@ find.package("BiocCheck")
 # Clean screen.
 cat("\014")
 packageVersion("topGO")
+
+
+##### Unit Tests #################
+devtools::use_testthat()
+devtools::test()
