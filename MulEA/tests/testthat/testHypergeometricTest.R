@@ -30,7 +30,7 @@ test_that("HypergeometricTest : testData out of DB model.", {
   expect_warning(hTestRes <- MulEA::runTest(muleaDataObject, muleaHypergeometricTestObject))
 })
 
-test_that("HypergeometricTest : testData out of DB pool.", {
+test_that("HypergeometricTest : testData out of pool.", {
   gmtMock <- data.frame(category = "GO:0000001",
                         description = "Imagin gen ontology to tests.",
                         listOfValues = I(list(c("a", "b", "c"))),
@@ -59,7 +59,7 @@ test_that("HypergeometricTest : matrix 2,2,2,2.", {
                fisher.test(matrix(c(2, 2, 2, 2), 2, 2), alternative = "less")$p.value)
 })
 
-test_that("HypergeometricTest : pool >> var + DBi, matrix 2,2,2,2.", {
+test_that("HypergeometricTest : pool >> var + DBi, matrix 2,2,2,18.", {
   gmtMock <- data.frame(category = "GO:0000001",
                         description = "Imagin gen ontology to tests.",
                         listOfValues = I(list(c("a", "b", "c", "d"))),
@@ -75,3 +75,57 @@ test_that("HypergeometricTest : pool >> var + DBi, matrix 2,2,2,2.", {
                fisher.test(matrix(c(2, 2, 2, 18), 2, 2), alternative = "less")$p.value)
 })
 
+test_that("HypergeometricTest : DBi not include pool, matrix 2,0,2,2.", {
+  gmtMock <- data.frame(category = "GO:0000001",
+                        description = "Imagin gen ontology to tests.",
+                        listOfValues = I(list(c("a", "b", "c", "d"))),
+                        stringsAsFactors = FALSE)
+  muleaDataObject <- new(Class = "muleaData", gmt = gmtMock)
+  dataFromExperiment <- c("a", "b", "e", "f")
+  poolMock <- c("a", "b", "e", "f", "g", "h")
+  muleaHypergeometricTestObject <- new("muleaHypergeometricTest",
+                                       testData = dataFromExperiment,
+                                       pool = poolMock)
+  expect_equal(MulEA::runTest(muleaDataObject, muleaHypergeometricTestObject)$p.value,
+               fisher.test(matrix(c(2, 0, 2, 2), 2, 2), alternative = "less")$p.value)
+})
+
+test_that("HypergeometricTest : DB1 + DB2 => pool, matrix 1,3,2,2 and 2,2,1,3.", {
+  gmtMock1 <- data.frame(category = "GO:0000001",
+                        description = "Imagin gen ontology to tests.",
+                        listOfValues = I(list(c("a", "b", "c", "d"))),
+                        stringsAsFactors = FALSE)
+  gmtMock2 <- data.frame(category = "GO:0000002",
+                        description = "Imagin gen ontology to tests.",
+                        listOfValues = I(list(c("e", "f", "g", "h"))),
+                        stringsAsFactors = FALSE)
+  gmtMock <- rbind(gmtMock1, gmtMock2)
+
+  muleaDataObject <- new(Class = "muleaData", gmt = gmtMock)
+  dataFromExperiment <- c("d", "e", "f")
+  muleaHypergeometricTestObject <- new("muleaHypergeometricTest",
+                                       testData = dataFromExperiment)
+  expect_equal(MulEA::runTest(muleaDataObject, muleaHypergeometricTestObject)$p.value,
+               c(fisher.test(matrix(c(1, 3, 2, 2), 2, 2), alternative = "less")$p.value,
+                 fisher.test(matrix(c(2, 2, 1, 3), 2, 2), alternative = "less")$p.value))
+})
+
+test_that("HypergeometricTest : DB1 + DB2 => pool, matrix 2,2,2,0 and 2,2,1,3.", {
+  gmtMock1 <- data.frame(category = "GO:0000001",
+                         description = "Imagin gen ontology to tests.",
+                         listOfValues = I(list(c("a", "b", "c", "d"))),
+                         stringsAsFactors = FALSE)
+  gmtMock2 <- data.frame(category = "GO:0000002",
+                         description = "Imagin gen ontology to tests.",
+                         listOfValues = I(list(c("e", "f", "c", "d"))),
+                         stringsAsFactors = FALSE)
+  gmtMock <- rbind(gmtMock1, gmtMock2)
+
+  muleaDataObject <- new(Class = "muleaData", gmt = gmtMock)
+  dataFromExperiment <- c("b", "d", "e", "f")
+  muleaHypergeometricTestObject <- new("muleaHypergeometricTest",
+                                       testData = dataFromExperiment)
+  expect_equal(MulEA::runTest(muleaDataObject, muleaHypergeometricTestObject)$p.value,
+               c(fisher.test(matrix(c(2, 2, 2, 0), 2, 2), alternative = "less")$p.value,
+                 fisher.test(matrix(c(3, 1, 1, 1), 2, 2), alternative = "less")$p.value))
+})
