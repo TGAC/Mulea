@@ -64,13 +64,13 @@ dataFromExperimentScores <- c(0.09, 0.11, 0.15, 0.20, 0.21, 0.24, 0.28, 0.30, 0.
 
 muleaDataObject <- new(Class = "muleaData", gmt = modelDfFromFile)
 
-muleaKolmogorovSmirnovTestObject <- new("muleaKolmogorovSmirnovTest", testData = dataFromExperiment)
-rankedGseaTestObject <- new("rankedGseaTest", testData = dataFromExperiment, scores = dataFromExperimentScores, p = 3, numberOfPermutations = 10000)
+muleaKolmogorovSmirnovTestObject <- new("muleaKolmogorovSmirnovTest", testData = dataFromExperimentF)
+rankedGseaTestObject <- new("rankedGseaTest", testData = dataFromExperimentF, scores = dataFromExperimentScores, p = 3, numberOfPermutations = 10000)
 
 muleaHypergeometricTestObject <- new("muleaHypergeometricTest", testData = dataFromExperimentT)
 muleaHypergeometricTestObjectWithPool <- new("muleaHypergeometricTest", testData = dataFromExperimentT, pool = dataFromExperimentPool)
 muleaFisherTestObject <- new("muleaFisherTest", testData = dataFromExperimentT)
-muleaChiSquaredTestObject <- new("muleaChiSquaredTest", testData = dataFromExperiment)
+muleaChiSquaredTestObject <- new("muleaChiSquaredTest", testData = dataFromExperimentT)
 
 ksTestRes <- MulEA::runTest(muleaDataObject, muleaKolmogorovSmirnovTestObject)
 ksWithRankTestRes <- MulEA::runTest(muleaDataObject, rankedGseaTestObject)
@@ -80,10 +80,10 @@ fTestRes <- MulEA::runTest(muleaDataObject, muleaFisherTestObject)
 chTestRes <- MulEA::runTest(muleaDataObject, muleaChiSquaredTestObject)
 
 
-gseaAdjustment <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestRes, sampleVector = dataFromExperiment,
+gseaAdjustment <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestRes, sampleVector = dataFromExperimentT,
                                                              steps = 100, adjustMethod = "GSEA")
-gseaAdjustmentWithPool <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestRes, sampleVector = dataFromExperiment,
-                                                                     steps = 2)
+gseaAdjustmentWithPool <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestResWithPool, sampleVector = dataFromExperimentT,
+                                                                     steps = 100, poolVector = dataFromExperimentPool, adjustMethod = "GSEA")
 
 
 decoratedTestRes <- MulEA::runTest(new(Class = "muleaData", model = hTestRes), muleaKolmogorovSmirnovTestObject)
