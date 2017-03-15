@@ -13,11 +13,11 @@ vignette: >
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, error = TRUE)
 ```
 
-THIS IS VIGNETTE in time of development. :)
+This vignette was created during the development process.
 
-MulEA (Multi Enrichment Analysis) is a package/tool for functional interpretation and integration of multi-omics data sets. It can work with ontologies as GO, ... 
+MulEA (Multi Enrichment Analysis) is a package/tool for functional interpretation and integration of multi-omics data sets. It can work with ontologies such as GO, ... 
 
-Actually implemented features (explained in details ... ) are:
+Implemented features include:
 
 - [Mulea Database Workflow](#mulea-database-workflow)
     - [File](#file)
@@ -41,29 +41,26 @@ Actually implemented features (explained in details ... ) are:
 
 
 ## Mulea Database Workflow
-We have 3 ways of working with data in MulEA package. You can work directly from our global DB, you can work with your local DB or with files. Below you can find detailed instructions.
-
+There are 3 way to work with data in MulEA; Directly from our global DB, with a local database or local files. Detailed instructions follow.
 
 ### File
-File which includes model need to be in GMT: Gene Matrix Transposed file format (*.gmt) ([format explanation](http://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29)). You can find example of that file under MulEA installation directory in example folder. To find installation directory use find.package("MulEA") command.
+The file which includes model must be in GMT: Gene Matrix Transposed file format (*.gmt) ([format explanation](http://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29)). Examples of the file are under MulEA installation directory in the example folder. To find the installation directory use find.package("MulEA") command.
 
-To read GMT file as dataframe use this methos please: `MulEA::readGmtFileAsDF()`. Method accepts one required (*) argument `gmtFilePath`.
+In order to read the GMT file as a dataframe use: `MulEA::readGmtFileAsDF()`. Method requires one (*) argument `gmtFilePath`.
 
-- `gmtFilePath` - It is path to file, which include model. Example: `"R/MulEA/example/model.gmt"`
+- `gmtFilePath` - This is the path to the file, Example: `"R/MulEA/example/model.gmt"`
 
-Model is read into the data frame which looks like that:
-
+The model is then read into the data frame, such:
 ```{r, results = 'asis'} 
 pathToModelGmtFile <- paste(find.package("MulEA"),"/example/model.gmt", sep = "")
 modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = pathToModelGmtFile)
 knitr::kable(modelDfFromFile, caption = "Model Data Frame")
 ```
 
-You can also save data frame which represents model to GMT file. To do it use `MulEA::saveModelFromDataFrameToGmtFile()`. You have to provide two arguments `modelDF`, `gmtFilePath`.
+If you would like to save the data frame that represents the model of the GMT file, use: `MulEA::saveModelFromDataFrameToGmtFile()`. You have to provide two arguments `modelDF`, `gmtFilePath`.
 
-- `modelDF` - A data frame represents model.
+- `modelDF` - Model data frame.
 - `gmtFilePath` - Path to file where you want to save model. Example: `"R/MulEA/example/savedModel.gmt"`
-
 
 ### Local Mulea DB
 With MulEA you can have all your models (models from files, global DB etc.) in one place. This place is local DB. This open for you an easy way to control, share and work with all your models. Before storing or downloading models thare you need to run database. To do it please use `MulEA::startLocalDatabase()`, this method creates the same schema as on Global DB, but locally on your computer. If schema has been already created it reads database. This method also has one argument:
