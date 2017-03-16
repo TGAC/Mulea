@@ -32,7 +32,7 @@ setMethod("initialize", "muleaKolmogorovSmirnovTest",
 
                                 })
 
-              resultDf <- data.frame(dataObject@gmt, pvalues)
+              resultDf <- data.frame(dataObject@gmt, "p.value" = pvalues)
               resultDf
 
             }

@@ -25,7 +25,7 @@ setMethod("initialize", "rankedGseaTest",
             .Object@test <- function(dataObject, testObject) {
 
               listmodelDfFromFile <- dataObject@gmt$listOfValues
-              names(listmodelDfFromFile) <- dataObject@gmt$category
+              names(listmodelDfFromFile) <- dataObject@gmt$ontologyId
 
               samplesToAnalisys <- testObject@scores
               names(samplesToAnalisys) <- testObject@testData
@@ -34,9 +34,9 @@ setMethod("initialize", "rankedGseaTest",
                                 stats = samplesToAnalisys,
                                 gseaParam = testObject@p, nperm = testObject@numberOfPermutations)
 
-              resultDf <- merge(dataObject@gmt, fgseaRes, by.x = "category", by.y = "pathway", all = TRUE)[c("category", "description", "listOfValues", "pval")]
+              resultDf <- merge(dataObject@gmt, fgseaRes, by.x = "ontologyId", by.y = "pathway", all = TRUE)[c("ontologyId", "ontologyName", "listOfValues", "pval")]
+              colnames(resultDf) <- c("ontologyId", "ontologyName", "listOfValues", "p.value")
               resultDf
-
             }
 
             .Object
