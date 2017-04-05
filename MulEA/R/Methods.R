@@ -1,7 +1,5 @@
 calculateHypergeometricTest <- function(model, sampleVector, poolVector = NULL) {
-  if ( !checkIfPoolIncludeSample(model, sampleVector, poolVector) ) {
-    return(NA)
-  }
+  sampleVector <- checkIfPoolIncludeSample(model, sampleVector, poolVector)
 
   if (0 != length(poolVector)) {
     allElements <- unique(poolVector)
@@ -10,7 +8,7 @@ calculateHypergeometricTest <- function(model, sampleVector, poolVector = NULL) 
     allElements <- unique(unlist(model$listOfValues))
   }
 
-  testResults <- ddply(.data = model,  .variables = c("category"), .fun = function(dfRow) {
+  testResults <- ddply(.data = model,  .variables = c("ontologyId"), .fun = function(dfRow) {
     poolAndSelectedAndDBiIntersection <- intersect(sampleVector, dfRow[1, 'listOfValues'][[1]])
 
     selectedAndInGroup <- length(poolAndSelectedAndDBiIntersection)
@@ -18,15 +16,18 @@ calculateHypergeometricTest <- function(model, sampleVector, poolVector = NULL) 
     outOfSelectionAndInGroup <- length(setdiff(dfRow[1, 'listOfValues'][[1]], sampleVector))
     outOfSelectionAndOutOfGroup <- length(setdiff(allElements, union(sampleVector, dfRow[1, 'listOfValues'][[1]])))
 
+    contingencyTable <- matrix(c(selectedAndInGroup,
+                                 selectedAndOutOfGroup,
+                                 outOfSelectionAndInGroup,
+                                 outOfSelectionAndOutOfGroup),
+                               2, 2)
+
     data <- data.frame(
-      'description' = dfRow['description'],
+      'ontologyName' = dfRow['ontologyName'],
       'listOfValues' = dfRow["listOfValues"],
-      'listOfValuesUnderCategory' = I(list(poolAndSelectedAndDBiIntersection)),
-      'q' = selectedAndInGroup,
-      'm' = selectedAndInGroup + outOfSelectionAndInGroup,
-      'n' = selectedAndOutOfGroup + outOfSelectionAndOutOfGroup,
-      'k' = selectedAndInGroup + selectedAndOutOfGroup,
-      'p-value' = phyper(selectedAndInGroup,
+      'overlappingData' = I(list(poolAndSelectedAndDBiIntersection)),
+      'contingencyTable' = I(list(contingencyTable)),
+      'p.value' = phyper(selectedAndInGroup,
                          selectedAndInGroup + outOfSelectionAndInGroup,
                          selectedAndOutOfGroup + outOfSelectionAndOutOfGroup,
                          selectedAndInGroup + selectedAndOutOfGroup, lower.tail = TRUE))
@@ -39,21 +40,21 @@ checkIfPoolIncludeSample <- function(model, sampleVector, poolVector = NULL) {
   if (0 != length(poolVector)) {
     if (0 != sum(!(sampleVector %in% poolVector))) {
       warning("testData are outside of pool.", " ",
-              paste(setdiff(sampleVector, unique(unlist(model$listOfValues))), collapse = ", "))
-      return(FALSE)
+              paste(setdiff(sampleVector, unique(poolVector)), collapse = ", "))
+      return(setdiff(sampleVector, setdiff(sampleVector, unique(poolVector))))
     }
   } else {
     if (0 != sum(!(sampleVector %in% unique(unlist(model$listOfValues))))) {
       warning("testData are outside of gmt.", " ",
               paste(setdiff(sampleVector, unique(unlist(model$listOfValues))), collapse = ", "))
-      return(FALSE)
+      return(setdiff(sampleVector, setdiff(sampleVector, unique(unlist(model$listOfValues)))))
     }
   }
-  return(TRUE)
+  return(sampleVector)
 }
 
 cutGmtToPool <- function(gmt, pool) {
-  cutDF <- plyr::ddply(.data = gmt,  .variables = c("category"), .fun = function(dfRow) {
+  cutDF <- plyr::ddply(.data = gmt,  .variables = c("ontologyId"), .fun = function(dfRow) {
     dfRow$listOfValues[[1]] <- intersect(dfRow$listOfValues[[1]], pool)
     dfRow
   })
@@ -61,13 +62,12 @@ cutGmtToPool <- function(gmt, pool) {
 }
 
 gseaPermutationTest <- function(modelWithTestDf, steps, sampleVector, poolVector = character(0)) {
-  if ( !checkIfPoolIncludeSample(modelWithTestDf, sampleVector, poolVector) ) {
-    return(NA)
-  }
+  sampleVector <- checkIfPoolIncludeSample(modelWithTestDf, sampleVector, poolVector)
 
   R_value_obs <- integer(0)
   for (i in 1:length(modelWithTestDf$p.value)) {
-    R_value_obs[i] <- sum(modelWithTestDf$p.value <= modelWithTestDf$p.value[i])
+    # R_value_obs[i] <- sum(modelWithTestDf$p.value <= modelWithTestDf$p.value[i])
+    R_value_obs[i] <- sum(modelWithTestDf$p.value[i] <= modelWithTestDf$p.value)
   }
 
   print(R_value_obs)
@@ -107,7 +107,8 @@ gseaPermutationTest <- function(modelWithTestDf, steps, sampleVector, poolVector
   for (l in 1:length(modelWithTestDf$p.value)) {
     # Why is 15 digits?
     # P_Sim_round=round(P_Sim_vec, digits=15)
-    R_value_exp[l] <- sum(simulationVector <= modelWithTestDf$p.value[l]) / steps
+    # R_value_exp[l] <- sum(simulationVector <= modelWithTestDf$p.value[l]) / steps
+    R_value_exp[l] <- sum(modelWithTestDf$p.value[l] <= simulationVector) / steps
     # R_value_exp[l] <- sum(as.vector(simulationMatrix[l,]) <= modelWithTestDf$p.value[l]) / steps
   }
 
@@ -125,7 +126,7 @@ gseaPermutationTestWithBinaryMatrix <- function(modelWithTestDf, steps, sampleVe
 
   allElements <- unique(unlist(modelWithTestDf$listOfValues))
   dataMatrix <- list()
-  for (i in 1:length(modelWithTestDf$category)) {
+  for (i in 1:length(modelWithTestDf$ontologyId)) {
     concatenation <- c(modelWithTestDf[i,]$listOfValues[[1]], allElements)
     dataMatrix <- append(dataMatrix, list(bit::as.bit(duplicated(concatenation)[(length(modelWithTestDf[i,]$listOfValues[[1]])+1):length(concatenation)])))
   }
@@ -157,9 +158,9 @@ gseaPermutationTestWithBinaryMatrix <- function(modelWithTestDf, steps, sampleVe
 
 adjustPvaluesForMultipleComparisons <- function(modelWithTestsResults, sampleVector, poolVector = character(0), adjustMethod = "bonferroni", steps = 1) {
   if (adjustMethod == "GSEA") {
-    adjustResult <- data.frame(modelWithTestsResults, "controllingProcedures" = gseaPermutationTest(modelWithTestDf = modelWithTestsResults, steps = steps, sampleVector = sampleVector, poolVector = poolVector))
+    adjustResult <- data.frame(modelWithTestsResults, "q.value" = gseaPermutationTest(modelWithTestDf = modelWithTestsResults, steps = steps, sampleVector = sampleVector, poolVector = poolVector))
   } else {
-    adjustResult <- data.frame(modelWithTestsResults, "controllingProcedures" = p.adjust(modelWithTestsResults$p.value, method = adjustMethod))
+    adjustResult <- data.frame(modelWithTestsResults, "q.value" = p.adjust(modelWithTestsResults$p.value, method = adjustMethod))
   }
   adjustResult
 }
@@ -167,43 +168,23 @@ adjustPvaluesForMultipleComparisons <- function(modelWithTestsResults, sampleVec
 
 calculateTestOnContingencyTable <- function(testMethod, ...) {
   function(model, sampleVector, poolVector = NULL) {
-    # Chcking if experiment data all in model data.
-    if (0 != length(poolVector)) {
-      if (0 != sum(!(sampleVector %in% poolVector))) {
-        warning("testData are outside of pool.", " ",
-                paste(setdiff(sampleVector, unique(unlist(model$listOfValues))), collapse = ", "))
-        return(NA)
-      }
-    } else {
-      if (0 != sum(!(sampleVector %in% unique(unlist(model$listOfValues))))) {
-        warning("testData are outside of gmt.", " ",
-                paste(setdiff(sampleVector, unique(unlist(model$listOfValues))), collapse = ", "))
-        return(NA)
-      }
-    }
+    sampleVector <- checkIfPoolIncludeSample(model, sampleVector, poolVector)
+
 
     if (0 != length(poolVector)) {
       allElements <- unique(poolVector)
+      model <- cutGmtToPool(gmt = model, pool = poolVector)
     } else {
       allElements <- unique(unlist(model$listOfValues))
     }
-    testResults <- ddply(.data = model,  .variables = c("category"), .fun = function(dfRow) {
 
-      if (0 != length(poolVector)) {
-        listOfValuesUnderCategory <- modelSampleIntersection <- intersect(dfRow[1, 'listOfValues'][[1]], sampleVector)
-        selectedAndInGroup <- length(modelSampleIntersection)
-        selectedAndOutOfGroup <- length(setdiff(sampleVector, modelSampleIntersection))
-        outOfSelectionAndInGroup <- length(setdiff(dfRow[1, 'listOfValues'][[1]], sampleVector))
-        outOfSelectionAndOutOfGroup <- length(setdiff(allElements, union(sampleVector, dfRow[1, 'listOfValues'][[1]])))
-      } else {
-        listOfValuesUnderCategory <- poolAndSelectedAndDBiIntersection <- Reduce(intersect, list(allElements, sampleVector, dfRow[1, 'listOfValues'][[1]]))
-        modelPoolIntersection <- intersect(dfRow[1, 'listOfValues'][[1]], allElements)
+    testResults <- ddply(.data = model,  .variables = c("ontologyId"), .fun = function(dfRow) {
+      poolAndSelectedAndDBiIntersection <- intersect(sampleVector, dfRow[1, 'listOfValues'][[1]])
 
-        selectedAndInGroup <- length(poolAndSelectedAndDBiIntersection)
-        selectedAndOutOfGroup <- length(setdiff(sampleVector, poolAndSelectedAndDBiIntersection))
-        outOfSelectionAndInGroup <- length(setdiff(modelPoolIntersection, sampleVector))
-        outOfSelectionAndOutOfGroup <- length(setdiff(allElements, union(sampleVector, dfRow[1, 'listOfValues'][[1]])))
-      }
+      selectedAndInGroup <- length(poolAndSelectedAndDBiIntersection)
+      selectedAndOutOfGroup <- length(setdiff(sampleVector, poolAndSelectedAndDBiIntersection))
+      outOfSelectionAndInGroup <- length(setdiff(dfRow[1, 'listOfValues'][[1]], sampleVector))
+      outOfSelectionAndOutOfGroup <- length(setdiff(allElements, union(sampleVector, dfRow[1, 'listOfValues'][[1]])))
 
       contingencyTable <- matrix(c(selectedAndInGroup,
                                    selectedAndOutOfGroup,
@@ -211,11 +192,11 @@ calculateTestOnContingencyTable <- function(testMethod, ...) {
                                    outOfSelectionAndOutOfGroup),
                                  2, 2)
       data <- data.frame(
-        'description' = dfRow['description'],
+        'ontologyName' = dfRow['ontologyName'],
         'listOfValues' = dfRow["listOfValues"],
-        'listOfValuesUnderCategory' = I(list(listOfValuesUnderCategory)),
+        'overlappingData' = I(list(poolAndSelectedAndDBiIntersection)),
         'contingencyTable' = I(list(contingencyTable)),
-        'testResultsColumnName' = I(list(testMethod(contingencyTable, ...))))
+        'p.value' = testMethod(contingencyTable, ...)$p.value)
     })
     testResults
   }

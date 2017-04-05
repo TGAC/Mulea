@@ -13,9 +13,9 @@ readGmtFileAsDF <- function(gmtFilePath) {
             description <- paste("\"", fields[2], "\"", sep = "")
         }
         listOfValues <- fields[3:length(fields)]
-        data.frame('category' = category, 'description' = description, 'listOfValues' = I(list(listOfValues)), stringsAsFactors = FALSE)
+        data.frame('ontologyId' = category, 'ontologyName' = description, 'listOfValues' = I(list(listOfValues)), stringsAsFactors = FALSE)
     })
-    gmtAsDF[c("category", "description", "listOfValues")]
+    gmtAsDF[c("ontologyId", "ontologyName", "listOfValues")]
 }
 
 #TODO : Is that hepler needed?
@@ -28,7 +28,7 @@ readGmtFileAsPlaneDF <- function(gmtFilePath) {
 }
 
 saveModelFromDataFrameToGmtFile <- function(modelDF, gmtFilePath) {
-    vectorOfModel <- plyr::daply(.data = modelDF, .variables = c("category"), .fun = function(dataFrameRow){
+    vectorOfModel <- plyr::daply(.data = modelDF, .variables = c("ontologyId"), .fun = function(dataFrameRow){
         collapsedListOfValues <- paste(dataFrameRow[,3][[1]], collapse = "\t")
         paste(dataFrameRow[1], dataFrameRow[2], collapsedListOfValues, sep = "\t")
     })
