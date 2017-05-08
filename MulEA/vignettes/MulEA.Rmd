@@ -41,67 +41,80 @@ Implemented features include:
 
 
 ## Mulea Database Workflow
-There are 3 way to work with data in MulEA; Directly from our global DB, with a local database or local files. Detailed instructions follow.
+There are 3 ways to work with data in MulEA; directly from our global database, with a local database or local files. Detailed instructions follow.
 
 ### File
-The file which includes model must be in GMT: Gene Matrix Transposed file format (*.gmt) ([format explanation](http://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29)). Examples of the file are under MulEA installation directory in the example folder. To find the installation directory use find.package("MulEA") command.
+The file which includes the ontology must be in GMT: Gene Matrix Transposed file format (*.gmt) ([format explanation](http://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29)). Examples of the file are under MulEA installation directory in the example folder. To find the installation directory use find.package("MulEA") command.
 
 In order to read the GMT file as a dataframe use: `MulEA::readGmtFileAsDF()`. Method requires one (*) argument `gmtFilePath`.
 
 - `gmtFilePath` - This is the path to the file, Example: `"R/MulEA/example/model.gmt"`
 
-The model is then read into the data frame, such:
+The ontology is then read into the data frame, such:
 ```{r, results = 'asis'} 
 pathToModelGmtFile <- paste(find.package("MulEA"),"/example/model.gmt", sep = "")
 modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = pathToModelGmtFile)
 knitr::kable(modelDfFromFile, caption = "Model Data Frame")
 ```
 
-If you would like to save the data frame that represents the model of the GMT file, use: `MulEA::saveModelFromDataFrameToGmtFile()`. You have to provide two arguments `modelDF`, `gmtFilePath`.
+If you would like to save the data frame that represents the ontology of the GMT file, use: `MulEA::saveModelFromDataFrameToGmtFile()`. You have to provide two arguments `modelDF`, `gmtFilePath`.
 
-- `modelDF` - Model data frame.
-- `gmtFilePath` - Path to file where you want to save model. Example: `"R/MulEA/example/savedModel.gmt"`
+- `modelDF` - ontology data frame which represents the GMT file.
+- `gmtFilePath` - Path to file where you want to save the ontology. Example: `"R/MulEA/example/savedModel.gmt"`
 
+```{r, eval=FALSE} 
+   MulEA::saveModelFromDataFrameToGmtFile(modelDF = modelDfFromFile, gmtFilePath = pathToModelGmtFile)  
+
+```
 ### Local Mulea DB
-With MulEA you can have all your models (models from files, global DB etc.) in one place. This place is local DB. This open for you an easy way to control, share and work with all your models. Before storing or downloading models thare you need to run database. To do it please use `MulEA::startLocalDatabase()`, this method creates the same schema as on Global DB, but locally on your computer. If schema has been already created it reads database. This method also has one argument:
+With MulEA you can have all your ontologys (files, global DB etc.) in one place. This place is the local DB. This allows an easy way to control, share and work with all your ontologys. Before storing or downloading ontologys, run the database using: `MulEA::startLocalDatabase()`, this method creates the same schema Global DB uses, but locally on your computer. If the schema has already been created it reads the database, one argument is required for this method:
+- `muleaDBLocalization` - By default its value is `":memory:"` which means the DB is created in temporary memory. 
 
-- `muleaDBLocalization` - By default its value is `":memory:"` which means that DB is created in memory of computer. If you want to have file which represents you database, for example for sharing it, you should put a directory when SQLite file should be created. Example: `"/home/muleaDB/"`. File with name `MulEA.sqlite` will be created there.
 
-To see how database look like please install add-on to Mozilla Firefox https://addons.mozilla.org/en-US/firefox/addon/sqlite-manager/ and then go to url chrome://sqlitemanager/content/sqlitemanager.xul choose from main menu Database > Connect Database, then choose file MulEA.sqlite.
+If you would like to save the database, for sharing purposes or later use, specificy a directory such: `MulEA::startLocalDatabase("/home/muleaDB/DB1")`. Which will save the database as `/home/muleaDB/DB1Mulea.sqlite`
 
-It is good practise to close database connection after you finish work with MulEA. To do it type that command: `MulEA::stopLocalDatabase()`.
+To view the database install the Mozilla Firefox addon https://addons.mozilla.org/en-US/firefox/addon/sqlite-manager/ and then go Main Menu -> Database -> Connect Database, then choose the database file MulEA.sqlite.
 
-If database is running you are ready to add model to it. To do it use `MulEA::addModelToLocalDatabase()`. AddModelToLocalDatabase accepts 7 arguments. Four of them are required (*) `model`, `taxonomy_id`, `model_source`, `version`, and other 3 are optional `scientific_name`, `common_english_name`, `description`.
+It is good practise to close the database connection after you finish work with MulEA `MulEA::stopLocalDatabase()`.
 
-- `model` - Data Frame with model. For example a Data Frame returned by `MulEA::readGmtFileAsDF()`.
-- `taxonomy_id` - It is an integer represents a taxonomy id from NCBI. In case of homo sapiense it is 9001.
-- `model_source` -  It is a String. It should represents origin of mode. Gen Ontology can be "GO".
-- `version` - Integer represents a version of model. It alows you to have many versions of the same model. It it is secound model of homo sapiense from "GO", then good practice is putting there 2.
-- `scientific_name` - It is text, which represents scientific name. It should helps you to faster identify organism.
-- `common_english_name` - The same as above.
-- `description` - It is a place for your own notes about this specific model.
 
-To list models from you local DB invoke `MulEA::listModelsFromLocalDatabase()` (not implemented yet)
 
-You can remove model from DB by `MulEA::removeModelFromLocalDatabase()`. Arguments of that method are Primary Kay (PK) of organisms_models table.
+If database is running you are ready to add the ontology to it: `MulEA::addModelToLocalDatabase()`.It accepts 7 arguments. Four of them are required (*) `model`, `taxonomy_id`, `model_source`, `version`, and other 3 are optional `scientific_name`, `common_english_name`, `description`.
 
-- `taxonomy_id` - Integer represents a taxonomi id of organism.
-- `model_source` - Origin of model.
-- `version` - Version of model in DB.
+```{r, eval=FALSE}
+  MulEA::addModelToLocalDatabase(model = modelDfFromFile, taxonomy_id = 9001, model_source = "GO", version = 2);
 
-Getting model from DB is achived by two methods; `MulEA::getModelFromLocalDatabaseAsDf` and `MulEA::getModelFromLocalDatabaseAsList`. As name says it can be get from database in two way as data frame or list. Data frame is used with analysis methods provided by MulEA. List representation can be usefull as input to other packages methods. Both of them accept the same arguments, which are required (*) `taxonomy_id`, `model_source`, `version`.
+```
 
-In addition MulEA provides a helper method to save one model from local DB in file in GMT format. `MulEA::saveModelFromLocalDatabaseToFile()` accepts `taxonomy_id`, `model_source`, `version`, `gmtFilePath` all of them are required (*).
+- `model` - Data Frame with ontology For example a Data Frame returned by `MulEA::readGmtFileAsDF()`.
+- `taxonomy_id` - Integer that represents a taxonomy id from NCBI. In case of homo sapiens use 9001.
+- `model_source` -  String that represents the origin of the ontologoy. Gen Ontology can be "GO".
+- `version` - Integer that represents the ontology number. It alows for multiple versions of the same ontology. If second ontology use 2.
+- `scientific_name` - Text which represents the scientific name, aids in identifying the organism.
+- `common_english_name` - Same as above
+- `description` - Field for notes on the ontology
 
-- `gmtFilePath` - It is path to gmt file where model from local DB will be saved.
+To list ontologys from you local DB invoke `MulEA::listModelsFromLocalDatabase()` (not implemented yet)
 
+To remove an ontology from the database: `MulEA::removeModelFromLocalDatabase()`. Primary Key (PK) of organisms_models table as the argument.
+
+- `taxonomy_id` - Integer represents the taxonomi id of organism.
+- `model_source` - tring that represents the origin of the ontology. Gen Ontology can be "GO".
+- `version` - Version of the ontology in DB.
+
+
+To retrieve the ontology from the DB: `MulEA::getModelFromLocalDatabaseAsDf` or `MulEA::getModelFromLocalDatabaseAsList`. The data frame retrieval can be used with analysis methods provided by MulEA. The list representation can also be useful as input to other package's methods. Both versions require the same arguments, (*) `taxonomy_id`, `model_source`, `version`.
+
+In addition MulEA provides a helper method to save a ontology from the local DB in GMT format. `MulEA::saveModelFromLocalDatabaseToFile()` with arguments `taxonomy_id`, `model_source`, `version`, `gmtFilePath` all of them are required (*).
+
+- `gmtFilePath` - The path to gmt file where ontology from local DB will be saved.
 
 ### Global Mulea DB
 (Not implemented yet.)
 
 
 ## Data Analysis
-"Analysis of data is a process of inspecting, cleansing, transforming, and modeling data with the goal of discovering useful information, suggesting conclusions, and supporting decision-making.", [Wikipedia](https://en.wikipedia.org/wiki/Data_analysis). MulEA makes data analysis on data frames. We implemented for you three types of tests base on contingency tables, rankings and topology of data.
+"Analysis of data is a process of inspecting, cleansing, transforming, and modeling data with the goal of discovering useful information, suggesting conclusions, and supporting decision-making.", [Wikipedia](https://en.wikipedia.org/wiki/Data_analysis). MulEA performs data analysis on data frames. We implemented three types of tests base on contingency tables, rankings and topology of data.
 
 
 ### Analysis Methods
@@ -112,13 +125,13 @@ Hypothesis tests may be performed on contingency tables. Cells in contingency ta
 
 
 ##### Hypergeometric Test
-Hypergeometric test bases on [hypergeometric distribution](https://en.wikipedia.org/wiki/Hypergeometric_distribution). To perform it on some model you should invoke this method `MulEA::calculateHypergeometricTest()` with below parameters:
+Hypergeometric test bases on [hypergeometric distribution](https://en.wikipedia.org/wiki/Hypergeometric_distribution). To perform this: `MulEA::calculateHypergeometricTest()` with below arguments:
 
-- `model` - it is place for data frame represents model. Read it from file or load from DBs.
-- `sampleVector` - It is a vector of your experimental data. Example: `dataFromExperiment <- c("FBgn0004407", "FBgn0010438", "FBgn0003742")`.
-- `adjustMethod = NA` - as you can see, by default is is set to NA. You can specify an algorithm which helps you with [Multiple Comparisons Problem](#multiple-comparisons-problem).
+- `model` -  Read it from file or load from DBs.
+- `sampleVector` - Vector of your experimental data. Example: `dataFromExperiment <- c("FBgn0004407", "FBgn0010438", "FBgn0003742")`.
+- `adjustMethod = NA` - By default is is set to NA. You can specify an algorithm which helps you with [Multiple Comparisons Problem](#multiple-comparisons-problem).
 
-Data frame which you achieve as a results of running of this test looks like that:
+Data frame which you achieve as a result of running these tests:
 
 ```{r, results = 'asis'} 
 experimentalData <- c("FBgn0004407", "FBgn0010438", "FBgn0003742", "FBgn0029709", "FBgn0030341", "FBgn0037044", "FBgn0002887")
@@ -126,18 +139,18 @@ hypergeometricTest <- MulEA::calculateHypergeometricTest(model = modelDfFromFile
 knitr::kable(hypergeometricTest, caption = "Hypergeometric Test Result Data Frame")
 ```
 
-Columns names are `category`,	`description`,	`listOfValues`,	`listOfValuesUnderCategory`,	`q`,	`m`,	`n`,	`k`,	`p.value`. First three a are copies from input data frame. `listOfValuesUnderCategory` represents an intersection of list of values under category and experimental data vector. Contingency table in this test is represented by `q`,	`m`,	`n`,	`k`. P-values are in the last column of presented DF. 
+Column names are `category`,	`description`,	`listOfValues`,	`listOfValuesUnderCategory`,	`q`,	`m`,	`n`,	`k`,	`p.value`. First three are copies from the input data frame. `listOfValuesUnderCategory` represents an intersection of the listvalues under category and experimental data vector. The contingency table in this test is represented by `q`,	`m`,	`n`,	`k`. P-values are in the last column of presented DF. 
 
 
 ##### Fisher Test
-[Fisher test](#https://en.wikipedia.org/wiki/Fisher's_exact_test) is represented in MulEA by `MulEA::calculateFisherTest()` method. It takes the same list of arguments as [Hypergeometric Test](#hypergeometric-test), but it procucts different results.
+[Fisher test](#https://en.wikipedia.org/wiki/Fisher's_exact_test) is represented in MulEA by `MulEA::calculateFisherTest()`. It takes the same list of arguments as [Hypergeometric Test](#hypergeometric-test), but produces different results.
 
 ```{r, results = 'asis'} 
 fisherTest <- MulEA::calculateFisherTest(model = modelDfFromFile, sampleVector = experimentalData)
 knitr::kable(fisherTest, caption = "Fisher Test Result Data Frame")
 ```
 
-Structure of single cell of test results column is the same as R documentation about  [Fisher's Exact Test](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/fisher.test.html). To get it from data frame you can use similar formula to this `fisherTest[4,]$testResultsColumnName[[1]]`. It takes fourth row of resulted data frame and takes only unlisted cell with test resut, it looks like this: 
+The structure of the single cell test results column is the same as R documentation about  [Fisher's Exact Test](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/fisher.test.html). To retrieve from data from the frame use: `fisherTest[4,]$testResultsColumnName[[1]]`. It gets the fourth row of the data frame and takes an unlisted cell with test results such:
 
 ```{r, results = 'asis'} 
 fisherTest[4,]$testResultsColumnName[[1]]
@@ -145,19 +158,18 @@ fisherTest[4,]$testResultsColumnName[[1]]
 
 
 ##### Chi Squared Test
-The last test from that category is [Chi Squared Test](https://en.wikipedia.org/wiki/Chi-squared_test). To calculate it on the groups from model data frame you have to invoke this method: `MulEA::calculateChiSquaredTest()`. It takes the same list of arguments as two privously presented methods. Result data frame looks like below (We have presented only firs three rows, it is space consuming :)):
+The last test from that category is [Chi Squared Test](https://en.wikipedia.org/wiki/Chi-squared_test). To calculate it on the groups from the ontology data frame: `MulEA::calculateChiSquaredTest()`. It takes the same list of arguments as two previously presented methods. Results for the data frame shown below (First 3 rows).
 
 ```{r, results = 'asis'} 
 chiSquaredTest <- MulEA::calculateChiSquaredTest(model = modelDfFromFile, sampleVector = experimentalData)
 knitr::kable(head(chiSquaredTest, n = 3), caption = "Chi Squared Test Result Data Frame")
 ```
 
-Similar formula to this can be used to achive results for specific row of data `chiSquaredTest[2,]$testResultsColumnName[[1]]`. Result cell is in form of result from [Pearson's Chi-squared Test](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/chisq.test.html).
+A Similar formula to this can be used to achive results for specific rows of data: `chiSquaredTest[2,]$testResultsColumnName[[1]]`. The result cell is in form of results from [Pearson's Chi-squared Test](https://stat.ethz.ch/R-manual/R-devel/library/stats/html/chisq.test.html).
 
 ```{r, results = 'asis'} 
 chiSquaredTest[4,]$testResultsColumnName[[1]]
 ```
-
 
 #### Ranking Base
 (not implemented yet)
@@ -183,18 +195,17 @@ chiSquaredTest[4,]$testResultsColumnName[[1]]
 
 
 ##### General Approach
-According to article [Multiple Comparisons Problem](https://en.wikipedia.org/wiki/Multiple_comparisons_problem) you can adjust p-values of tested models by adding `adjustMethod` argument to contyngency table based tests methods. Value of this argument is one of listed values: "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr". You can find references to the method under this [link](http://stat.ethz.ch/R-manual/R-devel/library/stats/html/p.adjust.html).
+According to article [Multiple Comparisons Problem](https://en.wikipedia.org/wiki/Multiple_comparisons_problem) you can adjust p-values of tested ontologys by adding the `adjustMethod` argument to contingency table tests methods. The value of this argument is one of the listed values: "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr". References to this method can be found here: [link](http://stat.ethz.ch/R-manual/R-devel/library/stats/html/p.adjust.html).
 
-Data frame with adjustment of p-values has one extra column. You can see that column in below model:
+Data frames with adjusted p-values contain one extra column:
 
 ```{r, results = 'asis'} 
 hypergeometricTestWithAdjustment <- MulEA::calculateHypergeometricTest(model = modelDfFromFile, sampleVector = experimentalData, adjustMethod = "BH")
 knitr::kable(hypergeometricTestWithAdjustment, caption = "Hypergeometric Test Result With Adjustment Data Frame")
 ```
 
-
 ## Code Snippet
-You can copy paste this code to start working with MulEA more easely. All Snippet of the code regarding to some capture of this vignettes:
+You can copy and paste this code to start working with MulEA more easily. All Snippets of code regarding the vignette:
 
 [Reading GMT File](#file).
 
