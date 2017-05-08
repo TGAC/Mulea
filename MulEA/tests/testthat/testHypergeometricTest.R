@@ -29,7 +29,7 @@ test_that("HypergeometricTest : testData out of DB model.", {
   muleaHypergeometricTestObject <- new("muleaHypergeometricTest", testData = dataFromExperiment)
   expect_warning(hTestRes <- MulEA::runTest(muleaDataObject, muleaHypergeometricTestObject))
   expect_equal(hTestRes$p.value,
-               fisher.test(matrix(c(2, 1, 0, 0), 2, 2), alternative = "less")$p.value)
+               fisher.test(matrix(c(2, 1, 0, 0), 2, 2), alternative = "greater")$p.value)
 })
 
 test_that("HypergeometricTest : testData out of pool.", {
@@ -45,7 +45,7 @@ test_that("HypergeometricTest : testData out of pool.", {
                                        pool = poolMock)
   expect_warning(hTestRes <- MulEA::runTest(muleaDataObject, muleaHypergeometricTestObject))
   expect_equal(hTestRes$p.value,
-              fisher.test(matrix(c(2, 0, 0, 1), 2, 2), alternative = "less")$p.value)
+              fisher.test(matrix(c(2, 0, 0, 1), 2, 2), alternative = "greater")$p.value)
 })
 
 test_that("HypergeometricTest : matrix 2,2,2,2.", {
@@ -60,7 +60,7 @@ test_that("HypergeometricTest : matrix 2,2,2,2.", {
                                        testData = dataFromExperiment,
                                        pool = poolMock)
   expect_equal(MulEA::runTest(muleaDataObject, muleaHypergeometricTestObject)$p.value,
-               fisher.test(matrix(c(2, 2, 2, 2), 2, 2), alternative = "less")$p.value)
+               fisher.test(matrix(c(2, 2, 2, 2), 2, 2), alternative = "greater")$p.value)
 })
 
 test_that("HypergeometricTest : pool >> var + DBi, matrix 2,2,2,18.", {
@@ -76,7 +76,7 @@ test_that("HypergeometricTest : pool >> var + DBi, matrix 2,2,2,18.", {
                                        testData = dataFromExperiment,
                                        pool = poolMock)
   expect_equal(MulEA::runTest(muleaDataObject, muleaHypergeometricTestObject)$p.value,
-               fisher.test(matrix(c(2, 2, 2, 18), 2, 2), alternative = "less")$p.value)
+               fisher.test(matrix(c(2, 2, 2, 18), 2, 2), alternative = "greater")$p.value)
 })
 
 test_that("HypergeometricTest : DBi not include pool, matrix 2,0,2,2.", {
@@ -91,7 +91,7 @@ test_that("HypergeometricTest : DBi not include pool, matrix 2,0,2,2.", {
                                        testData = dataFromExperiment,
                                        pool = poolMock)
   expect_equal(MulEA::runTest(muleaDataObject, muleaHypergeometricTestObject)$p.value,
-               fisher.test(matrix(c(2, 0, 2, 2), 2, 2), alternative = "less")$p.value)
+               fisher.test(matrix(c(2, 0, 2, 2), 2, 2), alternative = "greater")$p.value)
 })
 
 test_that("HypergeometricTest : DB1 + DB2 => pool, matrix 1,3,2,2 and 2,2,1,3.", {
@@ -110,8 +110,8 @@ test_that("HypergeometricTest : DB1 + DB2 => pool, matrix 1,3,2,2 and 2,2,1,3.",
   muleaHypergeometricTestObject <- new("muleaHypergeometricTest",
                                        testData = dataFromExperiment)
   expect_equal(MulEA::runTest(muleaDataObject, muleaHypergeometricTestObject)$p.value,
-               c(fisher.test(matrix(c(1, 3, 2, 2), 2, 2), alternative = "less")$p.value,
-                 fisher.test(matrix(c(2, 2, 1, 3), 2, 2), alternative = "less")$p.value))
+               c(fisher.test(matrix(c(1, 3, 2, 2), 2, 2), alternative = "greater")$p.value,
+                 fisher.test(matrix(c(2, 2, 1, 3), 2, 2), alternative = "greater")$p.value))
 })
 
 test_that("HypergeometricTest : DB1 + DB2 => pool, matrix 2,2,2,0 and 2,2,1,3.", {
@@ -130,6 +130,6 @@ test_that("HypergeometricTest : DB1 + DB2 => pool, matrix 2,2,2,0 and 2,2,1,3.",
   muleaHypergeometricTestObject <- new("muleaHypergeometricTest",
                                        testData = dataFromExperiment)
   expect_equal(MulEA::runTest(muleaDataObject, muleaHypergeometricTestObject)$p.value,
-               c(fisher.test(matrix(c(2, 2, 2, 0), 2, 2), alternative = "less")$p.value,
-                 fisher.test(matrix(c(3, 1, 1, 1), 2, 2), alternative = "less")$p.value))
+               c(fisher.test(matrix(c(2, 2, 2, 0), 2, 2), alternative = "greater")$p.value,
+                 fisher.test(matrix(c(3, 1, 1, 1), 2, 2), alternative = "greater")$p.value))
 })

@@ -27,10 +27,10 @@ calculateHypergeometricTest <- function(model, sampleVector, poolVector = NULL) 
       'listOfValues' = dfRow["listOfValues"],
       'overlappingData' = I(list(poolAndSelectedAndDBiIntersection)),
       'contingencyTable' = I(list(contingencyTable)),
-      'p.value' = phyper(selectedAndInGroup,
+      'p.value' = phyper(selectedAndInGroup - 1,
                          selectedAndInGroup + outOfSelectionAndInGroup,
                          selectedAndOutOfGroup + outOfSelectionAndOutOfGroup,
-                         selectedAndInGroup + selectedAndOutOfGroup, lower.tail = TRUE))
+                         selectedAndInGroup + selectedAndOutOfGroup, lower.tail = FALSE))
   })
   testResults
 }
@@ -202,6 +202,6 @@ calculateTestOnContingencyTable <- function(testMethod, ...) {
   }
 }
 
-calculateFisherTest <- calculateTestOnContingencyTable(fisher.test, alternative = 'less')
+calculateFisherTest <- calculateTestOnContingencyTable(fisher.test, alternative = 'greater')
 
 calculateChiSquaredTest <- calculateTestOnContingencyTable(chisq.test)
