@@ -65,12 +65,10 @@ gseaPermutationTest <- function(modelWithTestDf, steps, sampleVector, poolVector
   sampleVector <- checkIfPoolIncludeSample(modelWithTestDf, sampleVector, poolVector)
 
   R_value_obs <- integer(0)
-  for (i in 1:length(modelWithTestDf$p.value)) {
-    # R_value_obs[i] <- sum(modelWithTestDf$p.value <= modelWithTestDf$p.value[i])
-    R_value_obs[i] <- sum(modelWithTestDf$p.value[i] <= modelWithTestDf$p.value)
+  pValueVectorFromDf <- round(modelWithTestDf$p.value, digits = 15)
+  for (i in 1:length(pValueVectorFromDf)) {
+    R_value_obs[i] <- sum(pValueVectorFromDf[i] >= pValueVectorFromDf)
   }
-
-  print(R_value_obs)
 
   if (0 != length(poolVector)) {
     allElements <- unique(poolVector)
@@ -80,7 +78,7 @@ gseaPermutationTest <- function(modelWithTestDf, steps, sampleVector, poolVector
   }
 
   simulationMatrix <- array(dim = c(length(modelWithTestDf$p.value), steps))
-  print(simulationMatrix)
+
   for (j in 1:steps) {
     randomData <- sample(allElements, length(sampleVector))
     for (i in 1:length(modelWithTestDf$p.value)) {
@@ -91,74 +89,33 @@ gseaPermutationTest <- function(modelWithTestDf, steps, sampleVector, poolVector
       outOfSelectionAndInGroup <- length(modelWithTestDf[i, 'listOfValues'][[1]]) - selectedAndInGroup
       outOfSelectionAndOutOfGroup <- length(allElements) - (selectedAndInGroup + selectedAndOutOfGroup + outOfSelectionAndInGroup)
 
-      simulationMatrix[i,j] = phyper(selectedAndInGroup,
+      simulationMatrix[i,j] = phyper(selectedAndInGroup - 1,
                                      selectedAndInGroup + outOfSelectionAndInGroup,
                                      selectedAndOutOfGroup + outOfSelectionAndOutOfGroup,
-                                     selectedAndInGroup + selectedAndOutOfGroup, lower.tail = TRUE)
+                                     selectedAndInGroup + selectedAndOutOfGroup, lower.tail = FALSE)
     }
   }
 
-
-  print(simulationMatrix)
-  simulationVector <- as.vector(simulationMatrix)
-  print(simulationVector)
+  simulationVector <- round(as.vector(simulationMatrix), digits = 15)
 
   R_value_exp <- integer(0)
-  for (l in 1:length(modelWithTestDf$p.value)) {
-    # Why is 15 digits?
-    # P_Sim_round=round(P_Sim_vec, digits=15)
-    # R_value_exp[l] <- sum(simulationVector <= modelWithTestDf$p.value[l]) / steps
-    R_value_exp[l] <- sum(modelWithTestDf$p.value[l] <= simulationVector) / steps
-    # R_value_exp[l] <- sum(as.vector(simulationMatrix[l,]) <= modelWithTestDf$p.value[l]) / steps
+  for (l in 1:length(pValueVectorFromDf)) {
+    R_value_exp[l] <- sum(pValueVectorFromDf[l] >= simulationVector) / steps
   }
-
-  print(R_value_exp)
 
   gseaPermutationTestVector <- round(R_value_exp / R_value_obs, digits = 10)
-  gseaPermutationTestVector
-}
+  gseaPermutationTestDf <- data.frame(
+    'R_exp' = R_value_exp,
+    'R_obs' = R_value_obs,
+    'q.value' = gseaPermutationTestVector)
 
-gseaPermutationTestWithBinaryMatrix <- function(modelWithTestDf, steps, sampleVector) {
-  R_value_obs <- integer(0)
-  for (i in 1:length(modelWithTestDf$p.value)) {
-    R_value_obs[i] <- sum(modelWithTestDf$p.value <= modelWithTestDf$p.value[i])
-  }
-
-  allElements <- unique(unlist(modelWithTestDf$listOfValues))
-  dataMatrix <- list()
-  for (i in 1:length(modelWithTestDf$ontologyId)) {
-    concatenation <- c(modelWithTestDf[i,]$listOfValues[[1]], allElements)
-    dataMatrix <- append(dataMatrix, list(bit::as.bit(duplicated(concatenation)[(length(modelWithTestDf[i,]$listOfValues[[1]])+1):length(concatenation)])))
-  }
-
-  simulationMatrix <- array(dim = c(length(modelWithTestDf$p.value), steps))
-  for (j in 1:steps) {
-    randomData <- bit::as.bit.which(sample(length(allElements), size = length(sampleVector)), length(allElements))
-    for (i in 1:length(dataMatrix)) {
-      q <- sum(dataMatrix[[i]] & randomData)
-      m <- sum(dataMatrix[[i]])
-      n <- length(allElements) - m
-      k <- sum(randomData)
-      # Why 1 - pvalue from test?
-      simulationMatrix[i,j] <- 1 - phyper(q, m, n, k, lower.tail = FALSE, log.p = FALSE)
-    }
-  }
-  simulationVector <- as.vector(simulationMatrix)
-
-  R_value_exp <- integer(0)
-  for (l in 1:length(modelWithTestDf$p.value)) {
-    # Why is 15 digits?
-    # P_Sim_round=round(P_Sim_vec, digits=15)
-    R_value_exp[l] <- sum(simulationVector <= modelWithTestDf$p.value[l]) / steps
-  }
-  gseaPermutationTestVector <- round(R_value_exp / R_value_obs, digits = 4)
-  gseaPermutationTestVector
+  gseaPermutationTestDf
 }
 
 
 adjustPvaluesForMultipleComparisons <- function(modelWithTestsResults, sampleVector, poolVector = character(0), adjustMethod = "bonferroni", steps = 1) {
   if (adjustMethod == "GSEA") {
-    adjustResult <- data.frame(modelWithTestsResults, "q.value" = gseaPermutationTest(modelWithTestDf = modelWithTestsResults, steps = steps, sampleVector = sampleVector, poolVector = poolVector))
+    adjustResult <- data.frame(modelWithTestsResults, gseaPermutationTest(modelWithTestDf = modelWithTestsResults, steps = steps, sampleVector = sampleVector, poolVector = poolVector))
   } else {
     adjustResult <- data.frame(modelWithTestsResults, "q.value" = p.adjust(modelWithTestsResults$p.value, method = adjustMethod))
   }

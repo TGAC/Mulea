@@ -84,7 +84,7 @@ chTestRes <- MulEA::runTest(muleaDataObject, muleaChiSquaredTestObject)
 
 
 gseaAdjustment <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestRes, sampleVector = dataFromExperimentT,
-                                                             steps = 1000, adjustMethod = "GSEA")
+                                                             steps = 10000, adjustMethod = "GSEA")
 gseaAdjustmentBH <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestRes, sampleVector = dataFromExperimentT,
                                                              steps = 100)
 gseaAdjustmentWithPool <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestResWithPool, sampleVector = dataFromExperimentT,

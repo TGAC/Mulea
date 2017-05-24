@@ -21,7 +21,6 @@ export(calculateFisherTest)
 export(calculateChiSquaredTest)
 export(adjustPvaluesForMultipleComparisons)
 export(gseaPermutationTest)
-export(gseaPermutationTestWithBinaryMatrix)
 
 exportClasses(muleaData, muleaKolmogorovSmirnovTest, muleaHypergeometricTest, muleaFisherTest, muleaChiSquaredTest)
 
