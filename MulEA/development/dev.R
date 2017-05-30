@@ -68,5 +68,6 @@ packageVersion("topGO")
 
 
 ##### Unit Tests #################
+library(testthat)
 devtools::use_testthat()
 devtools::test()
