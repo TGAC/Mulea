@@ -9,14 +9,17 @@ sessionInfo()
 # Build with vignetts.
 devtools::use_vignette(name = "MulEA")
 devtools::use_vignette(name = "test")
+
 devtools::build_vignettes()
+vignette("MulEA")
+
 vignette("test")
 devtools::use_vignette(name = "MulEA")
 devtools::build(binary = TRUE, args = c('--preclean'))
 devtools::build("/home/koralgooll/doktorat/Rpackages/Mulea/")
 devtools::install()
 devtools::reload()
-dev
+
 pkgbuild::build(dest_path = ".")
 getwd()
 install("pkgbuild")

@@ -176,9 +176,31 @@ chiSquaredTest[4,]$testResultsColumnName[[1]]
 
 
 ##### Kolmogorov Smirnov Test
-(not implemented yet)
+First implementation of ranking base tests is [Kolmogorov-Smirnov Test](https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Smirnov_test). To calculate that test we have to create a muleaKolmogorovSmirnovTest object. Signature of that object is "muleaKolmogorovSmirnovTest". This object accepts one constructor's argument testData. It is a list of ids. It represents ranking.
 
+```{r, results = 'asis'} 
+muleaPkgDir <- find.package("MulEA")
+modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = paste(muleaPkgDir,"/example/model.gmt", sep = ""))
+```
 
+```{r, results = 'asis', echo=TRUE} 
+muleaDataObject <- new(Class = "muleaData", gmt = modelDfFromFile)
+dataFromExperiment <- c("FBgn0004407", "FBgn0010438", "FBgn0003742", "FBgn0029709", "FBgn0030341", 
+                        "FBgn0037044", "FBgn0002887", "FBgn0028434", "FBgn0030170", "FBgn0263831")
+muleaKolmogorovSmirnovTestObject <- new("muleaKolmogorovSmirnovTest", testData = dataFromExperiment)
+ksTestRes <- MulEA::runTest(muleaDataObject, muleaKolmogorovSmirnovTestObject)
+```
+
+Returned data frame from K-S test look like that:
+
+```{r, results = 'asis'} 
+knitr::kable(head(ksTestRes, n = 3), caption = "K-S Test Result Data Frame")
+```
+  
+<br />
+<br />
+<br />
+  
 #### Graph Base
 (not implemented yet)
 
