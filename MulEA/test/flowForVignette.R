@@ -59,14 +59,14 @@ str(modelDfFromFile$listOfValues)
 
 muleaDataObject <- new(Class = "muleaData", gmt = modelDfFromFile)
 dataFromExperimentPool <- unique(c(unlist(muleaDataObject@gmt$listOfValues), c("FBgn0066666", "FBgn0000000", "FBgn0099999", "FBgn0011111", "FBgn0022222", "FBgn0777777", "FBgn0333333", "FBgn0003742", "FBgn0029709", "FBgn0030341")))
-dataFromExperimentF <- c("FBgn0004407", "FBgn0010438", "FBgn0003742", "FBgn0029709", "FBgn0030341", "FBgn0037044", "FBgn0002887", "FBgn0028434", "FBgn0030170", "FBgn0263831")
+dataFromExperiment <- c("FBgn0004407", "FBgn0010438", "FBgn0003742", "FBgn0029709", "FBgn0030341", "FBgn0037044", "FBgn0002887", "FBgn0028434", "FBgn0030170", "FBgn0263831")
 dataFromExperimentT <- c("FBgn0004407", "FBgn0010438", "FBgn0037044", "FBgn0002887", "FBgn0028434", "FBgn0030170", "FBgn0263831")
 dataFromExperimentScores <- c(0.09, 0.11, 0.15, 0.20, 0.21, 0.24, 0.28, 0.30, 0.45, 0.50)
 
 
 
-muleaKolmogorovSmirnovTestObject <- new("muleaKolmogorovSmirnovTest", testData = dataFromExperimentF)
-rankedGseaTestObject <- new("rankedGseaTest", testData = dataFromExperimentF, scores = dataFromExperimentScores, p = 3, numberOfPermutations = 10000)
+muleaKolmogorovSmirnovTestObject <- new("muleaKolmogorovSmirnovTest", testData = dataFromExperiment)
+rankedGseaTestObject <- new("rankedGseaTest", testData = dataFromExperiment, scores = dataFromExperimentScores, p = 3, numberOfPermutations = 10000)
 
 muleaHypergeometricTestObject <- new("muleaHypergeometricTest", testData = dataFromExperimentT)
 muleaHypergeometricTestObjectWithPool <- new("muleaHypergeometricTest", testData = dataFromExperimentT, pool = dataFromExperimentPool)

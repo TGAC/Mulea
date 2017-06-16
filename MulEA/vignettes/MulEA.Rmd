@@ -42,6 +42,7 @@ Implemented features include:
 
 ## Mulea Database Workflow
 There are 3 ways to work with data in MulEA; directly from our global database, with a local database or local files. Detailed instructions follow.
+see [the second section](#custom)  
 
 ### File
 The file which includes the ontology must be in GMT: Gene Matrix Transposed file format (*.gmt) ([format explanation](http://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29)). Examples of the file are under MulEA installation directory in the example folder. To find the installation directory use find.package("MulEA") command.
@@ -201,8 +202,10 @@ knitr::kable(head(ksTestRes, n = 3), caption = "K-S Test Result Data Frame")
 <br />
 <br />
   
-#### Graph Base
+#### Graph Base {#graph-base}
 (not implemented yet)
+
+#### Test paragfaph {#custom}
 
 
 ### Extra Operations
