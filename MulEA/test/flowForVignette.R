@@ -73,6 +73,8 @@ muleaHypergeometricTestObjectWithPool <- new("muleaHypergeometricTest", testData
 muleaFisherTestObject <- new("muleaFisherTest", testData = dataFromExperimentT)
 muleaChiSquaredTestObject <- new("muleaChiSquaredTest", testData = dataFromExperimentT)
 
+pathNetTestObject <- new("pathNetTest", testData = namesCheck[,1], scores = namesCheck[,2], graph = pathway, p = 3, numberOfPermutations = 10000)
+
 str(muleaKolmogorovSmirnovTestObject)
 str(muleaDataObject)
 ksTestRes <- MulEA::runTest(muleaDataObject, muleaKolmogorovSmirnovTestObject)
@@ -81,6 +83,7 @@ hTestRes <- MulEA::runTest(muleaDataObject, muleaHypergeometricTestObject)
 hTestResWithPool <- MulEA::runTest(muleaDataObject, muleaHypergeometricTestObjectWithPool)
 fTestRes <- MulEA::runTest(muleaDataObject, muleaFisherTestObject)
 chTestRes <- MulEA::runTest(muleaDataObject, muleaChiSquaredTestObject)
+patNetTestRes <- MulEA::runTest(muleaDataObject, pathNetTestObject)
 
 
 gseaAdjustment <- MulEA::adjustPvaluesForMultipleComparisons(modelWithTestsResults = hTestRes, sampleVector = dataFromExperimentT,
