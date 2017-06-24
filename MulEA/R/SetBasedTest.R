@@ -23,7 +23,6 @@ setMethod("initialize", "SetBasedTest",
             .Object@adjustMethod <- adjustMethod
 
             .Object@test <- function(setBaseTestObject) {
-              print("INITIALIZE")
               muleaHypergeometricTest <- MuleaHypergeometricTest(gmt = setBaseTestObject@gmt, testData = setBaseTestObject@testData, pool = setBaseTestObject@pool)
               muleaHypergeometricTestRes <- runTest(muleaHypergeometricTest)
               if (length(setBaseTestObject@adjustMethod) != 0) {
@@ -43,6 +42,5 @@ setMethod("initialize", "SetBasedTest",
 setMethod("runTest",
           signature(testObject = "SetBasedTest"),
           function(testObject) {
-            print("RUN TEST on SetBasedTest")
             testObject@test(testObject)
           })

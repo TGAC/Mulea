@@ -39,9 +39,10 @@ Collate:
     'FisherTest.R'
     'ChiSquaredTest.R'
     'KolmogorovSmirnovTest.R'
-    'GseaTest.R'
+    'SubramanianTest.R'
     'PathNetTest.R'
-    'API.R'
+    'SetBasedTest.R'
+    'RankedBasedTest.R'
 URL: http://yihui.name/knitr/
 BugReports: https://github.com/yihui/knitr/issues
 biocViews:

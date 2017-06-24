@@ -17,7 +17,6 @@ export(saveModelFromDataFrameToGmtFile)
 export(saveModelFromLocalDatabaseToFile)
 
 export("SetBasedTest")
-
-exportClasses(muleaData, muleaKolmogorovSmirnovTest, muleaFisherTest, muleaChiSquaredTest)
+export("RankedBasedTest")
 
 exportMethods(runTest)
