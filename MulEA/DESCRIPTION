@@ -41,6 +41,7 @@ Collate:
     'KolmogorovSmirnovTest.R'
     'GseaTest.R'
     'PathNetTest.R'
+    'API.R'
 URL: http://yihui.name/knitr/
 BugReports: https://github.com/yihui/knitr/issues
 biocViews:

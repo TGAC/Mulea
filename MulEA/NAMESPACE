@@ -15,12 +15,8 @@ export(getModelFromLocalDatabaseAsList)
 export(getModelFromLocalDatabaseAsDf)
 export(saveModelFromDataFrameToGmtFile)
 export(saveModelFromLocalDatabaseToFile)
-export(calculateFisherTest)
-export(calculateChiSquaredTest)
-export(adjustPvaluesForMultipleComparisons)
-export(gseaPermutationTest)
 
-export("MuleaHypergeometricTest")
+export("SetBasedTest")
 
 exportClasses(muleaData, muleaKolmogorovSmirnovTest, muleaFisherTest, muleaChiSquaredTest)
 
