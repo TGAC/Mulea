@@ -1,39 +1,3 @@
-calculateHypergeometricTest <- function(model, sampleVector, poolVector = NULL) {
-  sampleVector <- checkIfPoolIncludeSample(model, sampleVector, poolVector)
-
-  if (0 != length(poolVector)) {
-    allElements <- unique(poolVector)
-    model <- cutGmtToPool(gmt = model, pool = poolVector)
-  } else {
-    allElements <- unique(unlist(model$listOfValues))
-  }
-
-  testResults <- ddply(.data = model,  .variables = c("ontologyId"), .fun = function(dfRow) {
-    poolAndSelectedAndDBiIntersection <- intersect(sampleVector, dfRow[1, 'listOfValues'][[1]])
-
-    selectedAndInGroup <- length(poolAndSelectedAndDBiIntersection)
-    selectedAndOutOfGroup <- length(setdiff(sampleVector, poolAndSelectedAndDBiIntersection))
-    outOfSelectionAndInGroup <- length(setdiff(dfRow[1, 'listOfValues'][[1]], sampleVector))
-    outOfSelectionAndOutOfGroup <- length(setdiff(allElements, union(sampleVector, dfRow[1, 'listOfValues'][[1]])))
-
-    contingencyTable <- matrix(c(selectedAndInGroup,
-                                 selectedAndOutOfGroup,
-                                 outOfSelectionAndInGroup,
-                                 outOfSelectionAndOutOfGroup),
-                               2, 2)
-
-    data <- data.frame(
-      'ontologyName' = dfRow['ontologyName'],
-      'listOfValues' = dfRow["listOfValues"],
-      'overlappingData' = I(list(poolAndSelectedAndDBiIntersection)),
-      'contingencyTable' = I(list(contingencyTable)),
-      'p.value' = phyper(selectedAndInGroup - 1,
-                         selectedAndInGroup + outOfSelectionAndInGroup,
-                         selectedAndOutOfGroup + outOfSelectionAndOutOfGroup,
-                         selectedAndInGroup + selectedAndOutOfGroup, lower.tail = FALSE))
-  })
-  testResults
-}
 
 checkIfPoolIncludeSample <- function(model, sampleVector, poolVector = NULL) {
   # Chcking if experiment data all in model data.

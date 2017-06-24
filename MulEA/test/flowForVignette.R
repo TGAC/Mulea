@@ -100,3 +100,27 @@ decoratedTestRes <- MulEA::runTest(new(Class = "muleaData", model = hTestRes), m
 duplicated(c(unlist(hTestRes$listOfValues), dataFromExperiment))
 dataFromExperiment <- c(dataFromExperiment[1:2], dataFromExperiment[6:10])
 
+
+
+################################ Final 1.0.0 0bject approach ################################
+# Read example model and create experiment data
+muleaPkgDir <- find.package("MulEA")
+modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = paste(muleaPkgDir,"/example/model.gmt", sep = ""))
+dataFromExperimentT <- c("FBgn0004407", "FBgn0010438", "FBgn0037044", "FBgn0002887", "FBgn0028434", "FBgn0030170", "FBgn0263831")
+
+# Perform hipergeometric test
+muleaHypergeometricTestObject <- MuleaHypergeometricTest(gmt = modelDfFromFile, testData = dataFromExperimentT)
+hTestRes <- MulEA::runTest(muleaHypergeometricTestObject)
+
+# Perform hipergeometric test with pool
+muleaDataObject <- new(Class = "muleaData", gmt = modelDfFromFile)
+dataFromExperimentPool <- unique(c(unlist(muleaDataObject@gmt$listOfValues), c("FBgn0066666", "FBgn0000000", "FBgn0099999", "FBgn0011111", "FBgn0022222", "FBgn0777777", "FBgn0333333", "FBgn0003742", "FBgn0029709", "FBgn0030341")))
+muleaHypergeometricTestObjectWithPool <- MuleaHypergeometricTest(gmt = modelDfFromFile, testData = dataFromExperimentT, pool = dataFromExperimentPool)
+hTestResWithPool <- MulEA::runTest(muleaHypergeometricTestObjectWithPool)
+
+
+
+
+
+# OLD
+muleaDataObject <- new(Class = "muleaData", gmt = modelDfFromFile)

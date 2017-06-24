@@ -30,9 +30,9 @@ VignetteBuilder: knitr
 LinkingTo: 
 Collate:
     'Mulea.R'
+    'GenericFunctions.R'
     'Utils.R'
     'LocalDb.R'
-    'Gsea.R'
     'Methods.R'
     'MuleaData.R'
     'HypergeometricTest.R'
@@ -41,8 +41,6 @@ Collate:
     'KolmogorovSmirnovTest.R'
     'GseaTest.R'
     'PathNetTest.R'
-    'Classes.R'
-    'GenericFunctions.R'
 URL: http://yihui.name/knitr/
 BugReports: https://github.com/yihui/knitr/issues
 biocViews:

@@ -15,13 +15,13 @@ export(getModelFromLocalDatabaseAsList)
 export(getModelFromLocalDatabaseAsDf)
 export(saveModelFromDataFrameToGmtFile)
 export(saveModelFromLocalDatabaseToFile)
-export(runGSEA)
-export(calculateHypergeometricTest)
 export(calculateFisherTest)
 export(calculateChiSquaredTest)
 export(adjustPvaluesForMultipleComparisons)
 export(gseaPermutationTest)
 
-exportClasses(muleaData, muleaKolmogorovSmirnovTest, muleaHypergeometricTest, muleaFisherTest, muleaChiSquaredTest)
+export("MuleaHypergeometricTest")
+
+exportClasses(muleaData, muleaKolmogorovSmirnovTest, muleaFisherTest, muleaChiSquaredTest)
 
 exportMethods(runTest)
