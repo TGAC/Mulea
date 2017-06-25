@@ -38,12 +38,10 @@ setMethod("initialize", "RankedBasedTest",
                                                    numberOfPermutations = rankedBaseTestObject@numberOfPermutations)
                 rankedTestRes <- runTest(subramanianTest)
               } else if (method == "KS") {
-                subramanianKsTest <- SubramanianTest(gmt = rankedBaseTestObject@gmt,
-                                                   testData = rankedBaseTestObject@testData,
-                                                   scores = rankedBaseTestObject@scores,
-                                                   p = 0,
-                                                   numberOfPermutations = rankedBaseTestObject@numberOfPermutations)
-                rankedTestRes <- runTest(subramanianKsTest)
+                ksTest <- KolmogorovSmirnovTest(gmt = rankedBaseTestObject@gmt,
+                                                testData = rankedBaseTestObject@testData,
+                                                numberOfPermutations = rankedBaseTestObject@numberOfPermutations)
+                rankedTestRes <- runTest(ksTest)
               } else {
                 warning("You have to choose method by typing method parameter to RankedBasedTest object. Choose from 'Subramanian' or 'KS'.")
               }

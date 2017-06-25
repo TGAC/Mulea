@@ -74,12 +74,13 @@ setBasedTestWithPoolAndAdjustRes
 
 
 # RankedBasedTest approach
+rankedBasedTestKs <- RankedBasedTest(method = "KS", gmt = modelDfFromFile, testData = dataFromExperiment)
 rankedBasedTestSubramanian <- RankedBasedTest(method = "Subramanian", gmt = modelDfFromFile, testData = dataFromExperiment, scores = dataFromExperimentScores)
-rankedBasedTestKs <- RankedBasedTest(method = "KS", gmt = modelDfFromFile, testData = dataFromExperiment, scores = dataFromExperimentScores)
 
-rankedBasedTestSubramanianRes <- MulEA::runTest(rankedBasedTestSubramanian)
 rankedBasedTestKsRes <- MulEA::runTest(rankedBasedTestKs)
+rankedBasedTestSubramanianRes <- MulEA::runTest(rankedBasedTestSubramanian)
 
-rankedBasedTestSubramanianRes
 rankedBasedTestKsRes
+rankedBasedTestSubramanianRes
+
 

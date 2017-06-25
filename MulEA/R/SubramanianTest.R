@@ -4,9 +4,9 @@ SubramanianTest <- setClass("SubramanianTest",
                               gmt = "data.frame",
                               testData = "character",
                               scores = "numeric",
-                              test = "function",
                               p = "numeric",
-                              numberOfPermutations = "numeric"
+                              numberOfPermutations = "numeric",
+                              test = "function"
                             ))
 
 setMethod("initialize", "SubramanianTest",
@@ -15,8 +15,8 @@ setMethod("initialize", "SubramanianTest",
                    testData = character(),
                    scores = numeric(),
                    p = 1,
-                   test = NULL,
                    numberOfPermutations = 1000,
+                   test = NULL,
                    ...) {
 
             .Object@gmt <- gmt
