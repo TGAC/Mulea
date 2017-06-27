@@ -1,0 +1,147 @@
+---
+title: "MulEA tests"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Overview of tools that perform enrichment analysis 
+
+The overvier comprise web-services, Cytoscape plug-ins and other stand-alone tools and finally programming libriaries (typically R/Bioconductor) that perform enrichment analysis. Some tools provide this analysis a sole functionality or as one of many.
+We are comparing our results with number of popular and new promissing web services available as of May 2017
+The list include only services positively ranked by users: LabWorm (>=10 upvotes), Omics Tools (>=3 stars|), Cytoscape (>= 3 stars) or cited at least by 10 publications (without self citations):
+
+## Pathway and GO analysis
+
+This section lists tools calculating enrichment in molecular and pathway ontologies including GO, KEGG, ChEBI and others
+
+### Web services: general use
+
+* DAVID 
+* WebGestalt http://webgestalt.org/option.php
+* GOrilla http://cbl-gorilla.cs.technion.ac.il/
+* PANTHER http://pantherdb.org/
+* BioInfoMiner bioinfominer.com/
+* Enrichr http://amp.pharm.mssm.edu/Enrichr/
+* GeneCoDis3 http://genecodis.cnb.csic.es/
+* PSEA-Quant http://pseaquant.scripps.edu/
+* ToppGene toppgene.cchmc.org
+* XGR http://galahad.well.ox.ac.uk:3020/
+
+### Web services: plant specific
+
+* TAIR https://www.arabidopsis.org/tools/go_term_enrichment.jsp (based on PANTHER)
+* PlantGSEA http://structuralbiology.cau.edu.cn/PlantGSEA/
+* POEAS http://caps.ncbs.res.in/poeas
+
+Additional tools not scored
+
+ * WebGIVI http://raven.anr.udel.edu/webgivi/
+ * Funcassociate http://llama.mshri.on.ca/funcassociate/
+ * MamPhEA http://evol.nhri.org.tw/phenome/index.jsp?platform=mmus
+ * DroPhea http://evol.nhri.org.tw/phenome/index.jsp?platform=dmel
+ * AgriGO http://bioinfo.cau.edu.cn/agriGO/
+ * VirtualPlant http://virtualplant.bio.nyu.edu/cgi-bin/vpweb/
+ * Babelomics http://www.babelomics.org/
+ * WormExp http://wormexp.zoologie.uni-kiel.de/wormexp/
+ * FungiFun https://elbe.hki-jena.de/fungifun/fungifun.php
+ * Constellations http://gparc.org/docs/urn:lsid:8080.gpbroad.broadinstitute.org:genepatternmodules:345:1.1
+ * WTF https://evoldoers.github.io/wtfgo/web/index.html
+ * GeneSetDB http://www.genesetdb.auckland.ac.nz/haeremai.html
+ * EviNet https://www.evinet.org/
+ * LRPath http://lrpath.ncibi.org/
+
+### Stand-alone tools and Cytoscpae plugins
+
+* GSEA http://software.broadinstitute.org/gsea/index.jsp
+* FunRich http://funrich.org/
+* GeneSCF http://genescf.kandurilab.org/
+* Enrichment Map http://apps.cytoscape.org/apps/enrichmentmap
+ 
+Additional not scored
+
+* WTF https://github.com/evoldoers/wtfgenes
+* iPEAP http://www.tongji.edu.cn/~qiliu/ipeap.html
+* BubbleGUM http://www.ciml.univ-mrs.fr/applications/BubbleGUM/index.html
+
+### Libraries
+
+* fgsea https://www.bioconductor.org/packages/3.5/bioc/html/fgsea.html
+* XGR http://xgr.r-forge.r-project.org/
+
+## Graph-based approaches
+
+#### Extend pathways, ontology terms
+
+* NET-GE http://net-ge.biocomp.unibo.it/enrich
+* EnrichNET http://www.enrichnet.org/
+
+### Graph-supported pathway analysis
+
+In this category graph edges are used as additional evidences in pathway analysis
+
+* PathNet http://bioconductor.org/packages/release/bioc/html/PathNet.html. This method uses direct and indirect evidences to calculate differential expression. List of DEGs is subject to set enrichment analysis (hypergeometric test) using KEGG. Then, additional score is calculate to estimate relation between KEGG pathways
+* CePa https://cran.r-project.org/web/packages/CePa/
+* SPIA https://www.bioconductor.org/packages/release/bioc/html/SPIA.html
+* GANPA https://cran.r-project.org/web/packages/GANPA/index.html
+
+### Detect activated sub-pathways
+
+* TEAK https://code.google.com/archive/p/teak/. 
+* DEsubs https://www.bioconductor.org/packages/3.5/bioc/html/DEsubs.html
+* SubpathwayGM http://210.46.85.180:8080/SubpathwayGM/
+
+### Topology-based enrichment
+
+This category includes tools implementing graph-analytical methods as main mean of enrichment calculation
+
+* EnrichmentBrowser http://bioconductor.org/packages/release/bioc/html/EnrichmentBrowser.html
+* PWEA https://zlab.bu.edu/PWEA/
+
+## Tools calculating peak or motif enrichment
+
+* i-cisTarget http://gbiomed.kuleuven.be/apps/lcb/i-cisTarget
+* BioInfoMiner bioinfominer.com/
+* XGR http://xgr.r-forge.r-project.org/
+* Homer http://homer.ucsd.edu/homer
+* ChIP-Enrich http://chip-enrich.med.umich.edu/
+
+## Cross species analysis
+
+https://github.com/VCCRI/XGSA
+
+# Tool comparison
+
+This section lists of criteria we are using to compare tools. Tentative list:
+
+* Organisms supported
+  * list of model organism [yes/no] 
+  * other organisms [number]
+* Tyopes of ontologies
+  * list of most popular ontologies [yes/no]
+  * other ontologies [number] 
+  * user defined ontology [yes/no]
+* Types of enrichment tests
+  * list of types [yes/no]
+* Types of corrections
+* Visualisations
+  * list of most practical visyalisations [yes/no]
+
+# Use cases
+ 
+```{r cars, eval=F,echo=F}
+
+ch1_mapped <- merge(chch,ids,by.x='chemS',by.y='stereo',all.x=T)
+```
+
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
