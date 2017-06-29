@@ -30,6 +30,7 @@ This section lists tools calculating enrichment in molecular and pathway ontolog
 * PSEA-Quant http://pseaquant.scripps.edu/
 * ToppGene toppgene.cchmc.org
 * XGR http://galahad.well.ox.ac.uk:3020/
+* FuncAssociate http://llama.mshri.on.ca/funcassociate/
 
 ### Web services: plant specific
 
