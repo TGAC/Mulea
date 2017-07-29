@@ -28,12 +28,21 @@ devtools::use_testthat()
 devtools::test()
 
 
+###### Bioconductor - Package Submission ######
+
+
 ###### Integration Tests ######
+
+# CRAN -> R CMD check
+library(devtools)
+devtools::check()
+
 # Bioconducto -> R CMD BiocCheck
+source("https://bioconductor.org/biocLite.R")
 biocLite("BiocCheck")
 library(BiocCheck)
 #Do BiocCheck on development version of package, not installed. :P
-BiocCheck("/home/koralgooll/doktorat/Rpackages/Mulea/MulEA/")
+BiocCheck::BiocCheck(getwd())
 
 
 ###### Work Helpers ######
