@@ -1,4 +1,12 @@
 
+#' An S4 class to represent a ranked based tests in Mulea.
+#'
+#' @slot method A method from ranked methods to count results.
+#' @slot gmt A data.frame representing GMT's reprezentation of model.
+#' @slot testData A data from expeciment to analize accross model.
+#' @slot scores A vectore of scores per testData.
+#' @slot p A power of weight.
+#' @slot numberOfPermutations A number of permutations used in renked test.
 RankedBasedTest <- setClass("RankedBasedTest",
                             slots = list(
                               method = "character",
@@ -52,6 +60,8 @@ setMethod("initialize", "RankedBasedTest",
 
           })
 
+#' @describeIn RankedBasedTest Run test calculations.
+#' @param testObject Object of s4 class represents Mulea Test.
 setMethod("runTest",
           signature(testObject = "RankedBasedTest"),
           function(testObject) {

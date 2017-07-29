@@ -49,7 +49,7 @@ BiocCheck::BiocCheck(getwd())
 
 ###### Writing R documentation files ######
 library(roxygen2)
-
+roxygen2::roxygenise()
 
 ###### Work Helpers ######
 sessionInfo()

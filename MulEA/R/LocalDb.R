@@ -79,6 +79,40 @@ checkIfDbIsRunning <- function(db = NULL) {
 
 
 # PUBLIC API
+#' Sum of vector elements.
+#'
+#' \code{addModelToLocalDatabase} returns the sum of all the values present in its arguments.
+#'
+#' This is a generic function: methods can be defined for it directly
+#' or via the \code{\link{Summary}} group generic. For this to work properly,
+#' the arguments \code{...} should be unnamed, and dispatch is on the
+#' first argument.
+#'
+#' @param model Numeric, complex, or logical vectors.
+#' @param taxonomy_id A logical scalar. Should missing values (including NaN) be removed?
+#' @param model_source Numeric, complex, or logical vectors.
+#' @param version Numeric, complex, or logical vectors.
+#' @param scientific_name Numeric, complex, or logical vectors.
+#' @param common_english_name Numeric, complex, or logical vectors.
+#' @param description Numeric, complex, or logical vectors.
+#'
+#' @return If all inputs are integer and logical, then the output
+#'   will be an integer. If integer overflow
+#'   \url{http://en.wikipedia.org/wiki/Integer_overflow} occurs, the output
+#'   will be NA with a warning. Otherwise it will be a length-one numeric or
+#'   complex vector.
+#'
+#'   Zero-length vectors have sum 0 by definition. See
+#'   \url{http://en.wikipedia.org/wiki/Empty_sum} for more details.
+#' @examples
+#' #addModelToLocalDatabase(model = modelDfFromLocalDB, taxonomy_id = 9001, model_source = "GO", version = 0)
+#'
+#' #addModelToLocalDatabase(model = modelDfFromFile, taxonomy_id = 9001, model_source = "GO", version = 0)
+#'
+#'
+#' \dontrun{
+#' addModelToLocalDatabase("a")
+#' }
 addModelToLocalDatabase <- function(model, taxonomy_id, model_source, version,
                                     scientific_name = 'NULL', common_english_name = 'NULL',
                                     description = 'NULL') {

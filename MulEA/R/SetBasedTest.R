@@ -1,4 +1,10 @@
 
+#' An S4 class to represent a set based tests in Mulea.
+#'
+#' @slot gmt A data.frame representing GMT's reprezentation of model.
+#' @slot testData A data from expeciment to analize accross model.
+#' @slot pool A background data co count test.
+#' @slot adjustMethod A type of algorithm used to adjust values.
 SetBasedTest <- setClass("SetBasedTest",
                                     slots = list(
                                       gmt = "data.frame",
