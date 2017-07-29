@@ -15,7 +15,6 @@ LazyData: TRUE
 Imports:
     DBI (>= 0.3.1),
     RSQLite (>= 1.0.0),
-    topGO (>= 2.25.0),
     plyr (>= 1.8.4),
     methods (>= 3.3.2),
     fgsea (>= 1.0.2)
@@ -35,7 +34,6 @@ Collate:
     'Methods.R'
     'MuleaData.R'
     'HypergeometricTest.R'
-    'FisherTest.R'
     'ChiSquaredTest.R'
     'KolmogorovSmirnovTest.R'
     'SubramanianTest.R'

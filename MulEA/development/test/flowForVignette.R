@@ -64,9 +64,9 @@ setBasedTest <- SetBasedTest(gmt = modelDfFromFile, testData = dataFromExperimen
 setBasedTestWithPool <- SetBasedTest(gmt = modelDfFromFile, testData = dataFromExperiment, pool = dataFromExperimentPool)
 setBasedTestWithPoolAndAdjust <- SetBasedTest(gmt = modelDfFromFile, testData = dataFromExperiment, pool = dataFromExperimentPool, adjustMethod = "BH")
 
-setBasedTestRes <- MulEA::runTest(setBaseTest)
-setBasedTestWithPoolRes <- MulEA::runTest(setBaseTestWithPool)
-setBasedTestWithPoolAndAdjustRes <- MulEA::runTest(setBaseTestWithPoolAndAdjust)
+setBasedTestRes <- MulEA::runTest(setBasedTest)
+setBasedTestWithPoolRes <- MulEA::runTest(setBasedTestWithPool)
+setBasedTestWithPoolAndAdjustRes <- MulEA::runTest(setBasedTestWithPoolAndAdjust)
 
 setBasedTestRes
 setBasedTestWithPoolRes

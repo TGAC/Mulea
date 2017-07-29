@@ -25,6 +25,7 @@ vignette("MulEA")
 ###### Unit Tests ######
 library(testthat)
 devtools::use_testthat()
+cat("\014")
 devtools::test()
 
 
@@ -35,6 +36,7 @@ devtools::test()
 
 # CRAN -> R CMD check
 library(devtools)
+cat("\014")
 devtools::check()
 
 # Bioconducto -> R CMD BiocCheck
@@ -43,6 +45,10 @@ biocLite("BiocCheck")
 library(BiocCheck)
 #Do BiocCheck on development version of package, not installed. :P
 BiocCheck::BiocCheck(getwd())
+
+
+###### Writing R documentation files ######
+library(roxygen2)
 
 
 ###### Work Helpers ######
