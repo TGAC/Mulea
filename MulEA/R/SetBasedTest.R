@@ -3,7 +3,7 @@
 #'
 #' @slot gmt A data.frame representing GMT's reprezentation of model.
 #' @slot testData A data from expeciment to analize accross model.
-#' @slot pool A background data co count test.
+#' @slot pool A background data to count test.
 #' @slot adjustMethod A type of algorithm used to adjust values.
 SetBasedTest <- setClass("SetBasedTest",
                                     slots = list(
@@ -45,6 +45,8 @@ setMethod("initialize", "SetBasedTest",
 
           })
 
+#' @describeIn SetBasedTest runs test calculations.
+#' @param testObject Object of s4 class represents Mulea Test.
 setMethod("runTest",
           signature(testObject = "SetBasedTest"),
           function(testObject) {

@@ -1,4 +1,9 @@
 
+#' PRIVATE class : An S4 class to represent a ranked based tests in Mulea.
+#'
+#' @slot gmt A data.frame representing GMT's reprezentation of model.
+#' @slot testData A data from expeciment to analize accross model.
+#' @slot numberOfPermutations A number of permutations used in renked test.
 KolmogorovSmirnovTest <- setClass("KolmogorovSmirnovTest",
                                   slots = list(
                                     gmt = "data.frame",
@@ -41,6 +46,8 @@ setMethod("initialize", "KolmogorovSmirnovTest",
 
           })
 
+#' @describeIn KolmogorovSmirnovTest runs test calculations.
+#' @param testObject Object of s4 class represents Mulea Test.
 setMethod("runTest",
           signature(testObject = "KolmogorovSmirnovTest"),
           function(testObject) {

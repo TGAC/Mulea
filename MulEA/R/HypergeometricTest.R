@@ -1,4 +1,9 @@
 
+#' PRIVATE class : An S4 class to represent a Hypergeometric tests in Mulea.
+#'
+#' @slot gmt A data.frame representing GMT's reprezentation of model.
+#' @slot testData A data from expeciment to analize accross model.
+#' @slot pool A background data to count test.
 MuleaHypergeometricTest <- setClass("MuleaHypergeometricTest",
                              slots = list(
                                gmt = "data.frame",
@@ -60,6 +65,8 @@ setMethod("initialize", "MuleaHypergeometricTest",
 
           })
 
+#' @describeIn MuleaHypergeometricTest runs test calculations.
+#' @param testObject Object of s4 class represents Mulea Test.
 setMethod("runTest",
           signature(testObject = "MuleaHypergeometricTest"),
           function(testObject) {

@@ -2,53 +2,30 @@
 % Please edit documentation in R/LocalDb.R
 \name{addModelToLocalDatabase}
 \alias{addModelToLocalDatabase}
-\title{Sum of vector elements.}
+\title{\code{addModelToLocalDatabase}}
 \usage{
 addModelToLocalDatabase(model, taxonomy_id, model_source, version,
   scientific_name = "NULL", common_english_name = "NULL",
   description = "NULL")
 }
 \arguments{
-\item{model}{Numeric, complex, or logical vectors.}
+\item{model}{gmt model.}
 
-\item{taxonomy_id}{A logical scalar. Should missing values (including NaN) be removed?}
+\item{taxonomy_id}{tax id of species.}
 
-\item{model_source}{Numeric, complex, or logical vectors.}
+\item{model_source}{where did you found ypour model.}
 
-\item{version}{Numeric, complex, or logical vectors.}
+\item{version}{represents version of the model.}
 
-\item{scientific_name}{Numeric, complex, or logical vectors.}
+\item{scientific_name}{name of the species in literature.}
 
-\item{common_english_name}{Numeric, complex, or logical vectors.}
+\item{common_english_name}{name of the species in english literature.}
 
-\item{description}{Numeric, complex, or logical vectors.}
+\item{description}{your description about this model. Can contain metadata about models.}
 }
 \value{
-If all inputs are integer and logical, then the output
-  will be an integer. If integer overflow
-  \url{http://en.wikipedia.org/wiki/Integer_overflow} occurs, the output
-  will be NA with a warning. Otherwise it will be a length-one numeric or
-  complex vector.
-
-  Zero-length vectors have sum 0 by definition. See
-  \url{http://en.wikipedia.org/wiki/Empty_sum} for more details.
+Return DB queries and status of model adding operation.
 }
 \description{
-\code{addModelToLocalDatabase} returns the sum of all the values present in its arguments.
-}
-\details{
-This is a generic function: methods can be defined for it directly
-or via the \code{\link{Summary}} group generic. For this to work properly,
-the arguments \code{...} should be unnamed, and dispatch is on the
-first argument.
-}
-\examples{
-#addModelToLocalDatabase(model = modelDfFromLocalDB, taxonomy_id = 9001, model_source = "GO", version = 0)
-
-#addModelToLocalDatabase(model = modelDfFromFile, taxonomy_id = 9001, model_source = "GO", version = 0)
-
-
-\dontrun{
-addModelToLocalDatabase("a")
-}
+\code{addModelToLocalDatabase} adds model to database under presented public key (taxonomi_id, model_source, version).
 }

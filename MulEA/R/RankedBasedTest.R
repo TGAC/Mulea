@@ -60,7 +60,7 @@ setMethod("initialize", "RankedBasedTest",
 
           })
 
-#' @describeIn RankedBasedTest Run test calculations.
+#' @describeIn RankedBasedTest runs test calculations.
 #' @param testObject Object of s4 class represents Mulea Test.
 setMethod("runTest",
           signature(testObject = "RankedBasedTest"),

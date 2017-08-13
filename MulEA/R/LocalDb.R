@@ -3,6 +3,16 @@
 # .mode column
 # Link to SQL managera chrome://sqlitemanager/content/sqlitemanager.xul
 # PUBLIC API
+#' \code{startLocalDatabase}
+#'
+#' \code{startLocalDatabase} creates database, which can helps in working with big amount of models.
+#' DB has to be created to make queries on it.
+#'
+#' @param muleaDBLocalization Character which represents path to directory where should be created MulEA.sqlite file.
+#' If not provided DB will be created in memory. Example of path: "/home/mulea/countingdb/"
+#'
+#' @return If all inputs are integer and logical, then the output will be an DB creation status.
+#'
 startLocalDatabase <- function(muleaDBLocalization = ":memory:") {
     driver <- RSQLite::SQLite()
     if (":memory:" == muleaDBLocalization) {
@@ -44,6 +54,14 @@ startLocalDatabase <- function(muleaDBLocalization = ":memory:") {
     DbOperationResult
 }
 
+# PUBLIC API
+#' \code{stopLocalDatabase}
+#'
+#' \code{stopLocalDatabase} stops Mulea DB. It is important whean you have in plans to work for a long time with DB.
+#' It helps with data consystency.
+#'
+#' @return Result is the status of process of DB closing.
+#'
 stopLocalDatabase <- function() {
     db <- get("databaseConnection", envir = .GlobalEnv);
     DbOperationResult <- tryCatch(
@@ -79,40 +97,20 @@ checkIfDbIsRunning <- function(db = NULL) {
 
 
 # PUBLIC API
-#' Sum of vector elements.
+#' \code{addModelToLocalDatabase}
 #'
-#' \code{addModelToLocalDatabase} returns the sum of all the values present in its arguments.
+#' \code{addModelToLocalDatabase} adds model to database under presented public key (taxonomi_id, model_source, version).
 #'
-#' This is a generic function: methods can be defined for it directly
-#' or via the \code{\link{Summary}} group generic. For this to work properly,
-#' the arguments \code{...} should be unnamed, and dispatch is on the
-#' first argument.
+#' @param model gmt model.
+#' @param taxonomy_id tax id of species.
+#' @param model_source where did you found ypour model.
+#' @param version represents version of the model.
+#' @param scientific_name name of the species in literature.
+#' @param common_english_name name of the species in english literature.
+#' @param description your description about this model. Can contain metadata about models.
 #'
-#' @param model Numeric, complex, or logical vectors.
-#' @param taxonomy_id A logical scalar. Should missing values (including NaN) be removed?
-#' @param model_source Numeric, complex, or logical vectors.
-#' @param version Numeric, complex, or logical vectors.
-#' @param scientific_name Numeric, complex, or logical vectors.
-#' @param common_english_name Numeric, complex, or logical vectors.
-#' @param description Numeric, complex, or logical vectors.
+#' @return Return DB queries and status of model adding operation.
 #'
-#' @return If all inputs are integer and logical, then the output
-#'   will be an integer. If integer overflow
-#'   \url{http://en.wikipedia.org/wiki/Integer_overflow} occurs, the output
-#'   will be NA with a warning. Otherwise it will be a length-one numeric or
-#'   complex vector.
-#'
-#'   Zero-length vectors have sum 0 by definition. See
-#'   \url{http://en.wikipedia.org/wiki/Empty_sum} for more details.
-#' @examples
-#' #addModelToLocalDatabase(model = modelDfFromLocalDB, taxonomy_id = 9001, model_source = "GO", version = 0)
-#'
-#' #addModelToLocalDatabase(model = modelDfFromFile, taxonomy_id = 9001, model_source = "GO", version = 0)
-#'
-#'
-#' \dontrun{
-#' addModelToLocalDatabase("a")
-#' }
 addModelToLocalDatabase <- function(model, taxonomy_id, model_source, version,
                                     scientific_name = 'NULL', common_english_name = 'NULL',
                                     description = 'NULL') {
@@ -244,6 +242,17 @@ getModelFromLocalDatabase <- function(taxonomy_id, model_source, version) {
 }
 
 # PUBLIC API
+#' \code{saveModelFromLocalDatabaseToFile}
+#'
+#' \code{saveModelFromLocalDatabaseToFile} saves copy of the model in file.
+#'
+#' @param taxonomy_id tax id of species.
+#' @param model_source model source, which you provide adding model to DB.
+#' @param version represents version of the model.
+#' @param gmtFilePath path with name of file, where to save model. Example: "/hmoe/mulea/files/lastModel.gmt"
+#'
+#' @return Return gmt file under specific location which include model in gmt format.
+#'
 saveModelFromLocalDatabaseToFile <- function(taxonomy_id, model_source, version, gmtFilePath) {
     modelDfFromLocalDB <- getModelFromLocalDatabaseAsDf(taxonomy_id = 9001, model_source = "GO", version = 0)
     saveModelFromDataFrameToGmtFile(modelDF = modelDfFromLocalDB, gmtFilePath = gmtFilePath)
@@ -252,6 +261,16 @@ saveModelFromLocalDatabaseToFile <- function(taxonomy_id, model_source, version,
 }
 
 # PUBLIC API
+#' \code{getModelFromLocalDatabaseAsList}
+#'
+#' \code{getModelFromLocalDatabaseAsList} takes copy of the model in list form.
+#'
+#' @param taxonomy_id tax id of species.
+#' @param model_source model source, which you provide adding model to DB.
+#' @param version represents version of the model.
+#'
+#' @return Return list which include model.
+#'
 getModelFromLocalDatabaseAsList <- function(taxonomy_id, model_source, version) {
     retrievedModel <- getModelFromLocalDatabase(taxonomy_id, model_source, version)
     retrievedModelList <- as.list(strsplit(retrievedModel$listOfValues, "\t"))
@@ -259,7 +278,17 @@ getModelFromLocalDatabaseAsList <- function(taxonomy_id, model_source, version) 
     retrievedModelList
 }
 
-#PUBLIC API
+# PUBLIC API
+#' \code{getModelFromLocalDatabaseAsDf}
+#'
+#' \code{getModelFromLocalDatabaseAsDf} takes copy of the model in data frame form.
+#'
+#' @param taxonomy_id tax id of species.
+#' @param model_source model source, which you provide adding model to DB.
+#' @param version represents version of the model.
+#'
+#' @return Return data frame which include model.
+#'
 getModelFromLocalDatabaseAsDf <- function(taxonomy_id, model_source, version) {
     retrievedModel <- getModelFromLocalDatabase(taxonomy_id, model_source, version)
     ddply(.data = retrievedModel, .variables = c("category"),
@@ -273,6 +302,16 @@ getModelFromLocalDatabaseAsDf <- function(taxonomy_id, model_source, version) {
 }
 
 # PUBLIC API
+#' \code{removeModelFromLocalDatabase}
+#'
+#' \code{removeModelFromLocalDatabase} removes model from DB.
+#'
+#' @param taxonomy_id tax id of species.
+#' @param model_source model source, which you provide adding model to DB.
+#' @param version represents version of the model.
+#'
+#' @return Return status of delete operation.
+#'
 removeModelFromLocalDatabase <- function(taxonomy_id, model_source, version) {
     db <- get("databaseConnection", envir = .GlobalEnv)
 

@@ -1,5 +1,13 @@
 
 # PUBLIC API
+#' \code{readGmtFileAsDF}
+#'
+#' \code{readGmtFileAsDF} read model in data frame form from gmt file.
+#'
+#' @param gmtFilePath path with name of file, where the file is localized. Example: "/home/mulea/files/lastModel.gmt"
+#'
+#' @return Return data frame with model from specific location.
+#'
 readGmtFileAsDF <- function(gmtFilePath) {
     fileConnection <- file(gmtFilePath)
     lines <- readLines(fileConnection)
@@ -27,6 +35,16 @@ readGmtFileAsPlaneDF <- function(gmtFilePath) {
     model
 }
 
+# PUBLIC API
+#' \code{saveModelFromDataFrameToGmtFile}
+#'
+#' \code{saveModelFromDataFrameToGmtFile} saves copy of the model from data frame in gmt file.
+#'
+#' @param modelDF data frame with model.
+#' @param gmtFilePath path with name of file, where to save model. Example: "/hmoe/mulea/files/lastModel.gmt"
+#'
+#' @return Return gmt file under specific location which include model in gmt format.
+#'
 saveModelFromDataFrameToGmtFile <- function(modelDF, gmtFilePath) {
     vectorOfModel <- plyr::daply(.data = modelDF, .variables = c("ontologyId"), .fun = function(dataFrameRow){
         collapsedListOfValues <- paste(dataFrameRow[,3][[1]], collapse = "\t")

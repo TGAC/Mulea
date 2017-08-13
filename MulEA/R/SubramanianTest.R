@@ -1,4 +1,11 @@
 
+#' PRIVATE class : An S4 class to represent a ranked based tests in Mulea.
+#'
+#' @slot gmt A data.frame representing GMT's reprezentation of model.
+#' @slot testData A data from expeciment to analize accross model.
+#' @slot scores A vectore of scores per testData.
+#' @slot p A power of weight.
+#' @slot numberOfPermutations A number of permutations used in renked test.
 SubramanianTest <- setClass("SubramanianTest",
                             slots = list(
                               gmt = "data.frame",
@@ -46,6 +53,8 @@ setMethod("initialize", "SubramanianTest",
 
           })
 
+#' @describeIn SubramanianTest runs test calculations.
+#' @param testObject Object of s4 class represents Mulea Test.
 setMethod("runTest",
           signature(testObject = "SubramanianTest"),
           function(testObject) {
