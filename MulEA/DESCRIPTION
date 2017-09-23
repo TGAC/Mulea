@@ -5,7 +5,7 @@ Title: What the Package Does (Title Case)
 Version: 0.99.0
 Date: 2016-04-08
 Authors@R: c(
-    person("Wiktor", "Jurkowski", email = "Wiktor.Jurkowski@tgac.ac.uk", role = "aut"),
+    person("Wiktor", "Jurkowski", email = "Wiktor.Jurkowski@earlham.ac.uk", role = "aut"),
     person("Eszter", "Ari", email = "arieszter@gmail.com", role = c("aut", "cph")),
     person("Cezary", "Turek", email = "Cezary.Turek@gmail.com", role =  c("aut", "cre")),
     person("Peter", "Forgacs", email = "Peter.Forgacs3@gmail.com", role =  "ctb"))
