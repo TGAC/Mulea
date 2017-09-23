@@ -6,6 +6,11 @@
 #' @slot scores A vectore of scores per testData.
 #' @slot p A power of weight.
 #' @slot numberOfPermutations A number of permutations used in renked test.
+#' @return KolmogorovSmirnovTest object. Used as private object.
+#' @examples
+#' \dontrun{
+#' #It is a private s4 object. Look at RankedBasedTest's examples.
+#' }
 SubramanianTest <- setClass("SubramanianTest",
                             slots = list(
                               gmt = "data.frame",
@@ -55,6 +60,11 @@ setMethod("initialize", "SubramanianTest",
 
 #' @describeIn SubramanianTest runs test calculations.
 #' @param testObject Object of s4 class represents Mulea Test.
+#' @return runTest method for SubramanianTest object. Used as private function.
+#' @examples
+#' \dontrun{
+#' #It is a private method. Look at runTest of RankedBasedTest's examples.
+#' }
 setMethod("runTest",
           signature(testObject = "SubramanianTest"),
           function(testObject) {

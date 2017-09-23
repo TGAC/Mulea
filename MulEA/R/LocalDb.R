@@ -13,6 +13,8 @@
 #'
 #' @return If all inputs are integer and logical, then the output will be an DB creation status.
 #'
+#' @examples
+#' creationOfLocalDB <- MulEA::startLocalDatabase(":memory:")
 startLocalDatabase <- function(muleaDBLocalization = ":memory:") {
     driver <- RSQLite::SQLite()
     if (":memory:" == muleaDBLocalization) {
@@ -28,7 +30,7 @@ startLocalDatabase <- function(muleaDBLocalization = ":memory:") {
     DbOperationResult <- tryCatch(
         {
             DBI::dbBegin(conn = db)
-            DBI::dbGetQuery(conn = db,
+            statementRes <- DBI::dbSendStatement(conn = db,
                 "CREATE TABLE IF NOT EXISTS organisms_models (
                     taxonomy_id INTERGER NOT NULL,
                     scientific_name TEXT,
@@ -37,6 +39,7 @@ startLocalDatabase <- function(muleaDBLocalization = ":memory:") {
                     version INTEGER NOT NULL,
                     description TEXT,
                     PRIMARY KEY (taxonomy_id, model_source, version));")
+            DBI::dbClearResult(statementRes)
             DBI::dbCommit(conn = db)
         },
         error = function(c) {
@@ -61,7 +64,9 @@ startLocalDatabase <- function(muleaDBLocalization = ":memory:") {
 #' It helps with data consystency.
 #'
 #' @return Result is the status of process of DB closing.
-#'
+#' @examples
+#' creationOfLocalDB <- MulEA::startLocalDatabase(":memory:")
+#' stopDbResults <- MulEA::stopLocalDatabase()
 stopLocalDatabase <- function() {
     db <- get("databaseConnection", envir = .GlobalEnv);
     DbOperationResult <- tryCatch(
@@ -110,7 +115,12 @@ checkIfDbIsRunning <- function(db = NULL) {
 #' @param description your description about this model. Can contain metadata about models.
 #'
 #' @return Return DB queries and status of model adding operation.
-#'
+#' @examples
+#' muleaPkgDir <- find.package("MulEA")
+#' modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = paste(muleaPkgDir,"/example/model.gmt", sep = ""))
+#' creationOfLocalDB <- MulEA::startLocalDatabase(":memory:")
+#' MulEA::addModelToLocalDatabase(model = modelDfFromFile, taxonomy_id = 9001, model_source = "GO", version = 0)
+#' stopDbResults <- MulEA::stopLocalDatabase()
 addModelToLocalDatabase <- function(model, taxonomy_id, model_source, version,
                                     scientific_name = 'NULL', common_english_name = 'NULL',
                                     description = 'NULL') {
@@ -167,8 +177,9 @@ insertEntryToOrganismsModels <- function(taxonomy_id, model_source, version
     query <- paste("INSERT INTO organisms_models",
                    "(taxonomy_id, scientific_name, common_english_name, model_source, version, description)",
                    "VALUES (", values, ");", sep = " ")
-    print(query)
-    DBI::dbGetQuery(conn = db, query)
+    # print(query)
+    statementRes <- DBI::dbSendStatement(conn = db, query)
+    DBI::dbClearResult(statementRes)
 }
 
 createModelTable <- function(taxonomy_id, model_source, version) {
@@ -181,8 +192,9 @@ createModelTable <- function(taxonomy_id, model_source, version) {
                          PRIMARY KEY (category));"
 
     query <- paste("CREATE TABLE", tableName, tableDefinition, sep = " ")
-    print(query)
-    DBI::dbGetQuery(conn = db, query)
+    # print(query)
+    statementRes <- DBI::dbSendStatement(conn = db, query)
+    DBI::dbClearResult(statementRes)
 }
 
 generateModelTableName <- function(taxonomy_id, model_source, version) {
@@ -197,16 +209,17 @@ insertEntriesToModelTable <- function(model, taxonomy_id = taxonomy_id,
   tableName <- generateModelTableName(taxonomy_id, model_source, version)
 
   apply(model, 1, FUN = function(dataFrameRow){
-    category <- paste("\"", dataFrameRow$category, "\"", sep = "")
-    description <- dataFrameRow$description
+    category <- paste("\"", dataFrameRow$ontologyId, "\"", sep = "")
+    description <- dataFrameRow$ontologyName
     listOfValuesCollapsed <- trimws(paste(dataFrameRow$listOfValues, collapse = "\t"))
     listOfValuesCollapsedEscaped <- paste("\"", listOfValuesCollapsed, "\"", sep = "")
     listOfValues <- paste(category, description, listOfValuesCollapsedEscaped, sep = ", ")
     query <- paste("INSERT INTO", tableName,
                    "(category, description, listOfValues)",
                    "VALUES (", listOfValues, ");", sep = " ")
-    print(query)
-    DBI::dbGetQuery(conn = db, query)
+    # print(query)
+    statementRes <- DBI::dbSendStatement(conn = db, query)
+    DBI::dbClearResult(statementRes)
   })
 }
 
@@ -241,23 +254,10 @@ getModelFromLocalDatabase <- function(taxonomy_id, model_source, version) {
     DbOperationResult
 }
 
-# PUBLIC API
-#' \code{saveModelFromLocalDatabaseToFile}
-#'
-#' \code{saveModelFromLocalDatabaseToFile} saves copy of the model in file.
-#'
-#' @param taxonomy_id tax id of species.
-#' @param model_source model source, which you provide adding model to DB.
-#' @param version represents version of the model.
-#' @param gmtFilePath path with name of file, where to save model. Example: "/hmoe/mulea/files/lastModel.gmt"
-#'
-#' @return Return gmt file under specific location which include model in gmt format.
-#'
+# HIDDEN API
 saveModelFromLocalDatabaseToFile <- function(taxonomy_id, model_source, version, gmtFilePath) {
     modelDfFromLocalDB <- getModelFromLocalDatabaseAsDf(taxonomy_id = 9001, model_source = "GO", version = 0)
     saveModelFromDataFrameToGmtFile(modelDF = modelDfFromLocalDB, gmtFilePath = gmtFilePath)
-    #retrievedModel <- getModelFromLocalDatabase(taxonomy_id, model_source, version)
-    #write.table(file = gmtFilePath, x = retrievedModel, sep = "\t", quote = FALSE, row.names = FALSE, col.names = FALSE)
 }
 
 # PUBLIC API
@@ -270,7 +270,13 @@ saveModelFromLocalDatabaseToFile <- function(taxonomy_id, model_source, version,
 #' @param version represents version of the model.
 #'
 #' @return Return list which include model.
-#'
+#' @examples
+#' muleaPkgDir <- find.package("MulEA")
+#' modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = paste(muleaPkgDir,"/example/model.gmt", sep = ""))
+#' creationOfLocalDB <- MulEA::startLocalDatabase(":memory:")
+#' MulEA::addModelToLocalDatabase(model = modelDfFromFile, taxonomy_id = 9001, model_source = "GO", version = 0)
+#' getModelFromLocalDatabaseAsList(taxonomy_id = 9001, model_source = "GO", version = 0)
+#' stopDbResults <- MulEA::stopLocalDatabase()
 getModelFromLocalDatabaseAsList <- function(taxonomy_id, model_source, version) {
     retrievedModel <- getModelFromLocalDatabase(taxonomy_id, model_source, version)
     retrievedModelList <- as.list(strsplit(retrievedModel$listOfValues, "\t"))
@@ -288,17 +294,25 @@ getModelFromLocalDatabaseAsList <- function(taxonomy_id, model_source, version) 
 #' @param version represents version of the model.
 #'
 #' @return Return data frame which include model.
-#'
+#' @examples
+#' muleaPkgDir <- find.package("MulEA")
+#' modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = paste(muleaPkgDir,"/example/model.gmt", sep = ""))
+#' creationOfLocalDB <- MulEA::startLocalDatabase(":memory:")
+#' MulEA::addModelToLocalDatabase(model = modelDfFromFile, taxonomy_id = 9001, model_source = "GO", version = 0)
+#' MulEA::getModelFromLocalDatabaseAsDf(taxonomy_id = 9001, model_source = "GO", version = 0)
+#' stopDbResults <- MulEA::stopLocalDatabase()
 getModelFromLocalDatabaseAsDf <- function(taxonomy_id, model_source, version) {
     retrievedModel <- getModelFromLocalDatabase(taxonomy_id, model_source, version)
-    ddply(.data = retrievedModel, .variables = c("category"),
+    dfResultModel <- ddply(.data = retrievedModel, .variables = c("category"),
           .fun = function(dfRow) {
-              description <- paste("\"", dfRow[,"description"], "\"", sep = "")
+              ontologyName <- paste("\"", dfRow[,"description"], "\"", sep = "")
               listOfValues <- as.character(unlist(strsplit(dfRow[,"listOfValues"], "\t")))
-              modelDf <- data.frame('description' = description,
+              modelDf <- data.frame('description' = ontologyName,
                                     'listOfValues' = I(list(listOfValues)), stringsAsFactors = FALSE)
               modelDf
     })
+    names(dfResultModel) <- c("ontologyId","ontologyName", "listOfValues")
+    dfResultModel
 }
 
 # PUBLIC API
@@ -311,7 +325,13 @@ getModelFromLocalDatabaseAsDf <- function(taxonomy_id, model_source, version) {
 #' @param version represents version of the model.
 #'
 #' @return Return status of delete operation.
-#'
+#' @examples
+#' muleaPkgDir <- find.package("MulEA")
+#' modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = paste(muleaPkgDir,"/example/model.gmt", sep = ""))
+#' creationOfLocalDB <- MulEA::startLocalDatabase(":memory:")
+#' MulEA::addModelToLocalDatabase(model = modelDfFromFile, taxonomy_id = 9001, model_source = "GO", version = 0)
+#' MulEA::removeModelFromLocalDatabase(taxonomy_id = 9001, model_source = "GO", version = 0)
+#' stopDbResults <- MulEA::stopLocalDatabase()
 removeModelFromLocalDatabase <- function(taxonomy_id, model_source, version) {
     db <- get("databaseConnection", envir = .GlobalEnv)
 

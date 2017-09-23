@@ -15,3 +15,7 @@ Return data frame with model from specific location.
 \description{
 \code{readGmtFileAsDF} read model in data frame form from gmt file.
 }
+\examples{
+muleaPkgDir <- find.package("MulEA")
+modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = paste(muleaPkgDir,"/example/model.gmt", sep = ""))
+}

@@ -3,7 +3,7 @@
 
 
 # Create SQLite DB on local machine as file or in memory.
-creationOfLocalDB <- MulEA::startLocalDatabase("/home/koralgooll/doktorat/Rpackages/muleaDb/")
+creationOfLocalDB <- MulEA::startLocalDatabase("/home/cezary/temp/muleadb/")
 creationOfLocalDB <- MulEA::startLocalDatabase(":memory:")
 
 
@@ -82,5 +82,3 @@ rankedBasedTestSubramanianRes <- MulEA::runTest(rankedBasedTestSubramanian)
 
 rankedBasedTestKsRes
 rankedBasedTestSubramanianRes
-
-

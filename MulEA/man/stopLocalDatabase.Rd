@@ -13,3 +13,7 @@ Result is the status of process of DB closing.
 \code{stopLocalDatabase} stops Mulea DB. It is important whean you have in plans to work for a long time with DB.
 It helps with data consystency.
 }
+\examples{
+creationOfLocalDB <- MulEA::startLocalDatabase(":memory:")
+stopDbResults <- MulEA::stopLocalDatabase()
+}

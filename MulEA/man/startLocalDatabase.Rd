@@ -17,3 +17,6 @@ If all inputs are integer and logical, then the output will be an DB creation st
 \code{startLocalDatabase} creates database, which can helps in working with big amount of models.
 DB has to be created to make queries on it.
 }
+\examples{
+creationOfLocalDB <- MulEA::startLocalDatabase(":memory:")
+}

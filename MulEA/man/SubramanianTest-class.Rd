@@ -12,6 +12,11 @@
 \arguments{
 \item{testObject}{Object of s4 class represents Mulea Test.}
 }
+\value{
+KolmogorovSmirnovTest object. Used as private object.
+
+runTest method for SubramanianTest object. Used as private function.
+}
 \description{
 PRIVATE class : An S4 class to represent a ranked based tests in Mulea.
 }
@@ -34,3 +39,11 @@ PRIVATE class : An S4 class to represent a ranked based tests in Mulea.
 \item{\code{numberOfPermutations}}{A number of permutations used in renked test.}
 }}
 
+\examples{
+\dontrun{
+#It is a private s4 object. Look at RankedBasedTest's examples.
+}
+\dontrun{
+#It is a private method. Look at runTest of RankedBasedTest's examples.
+}
+}

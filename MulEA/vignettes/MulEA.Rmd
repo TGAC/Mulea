@@ -277,7 +277,6 @@ MulEA::removeModelFromLocalDatabase(taxonomy_id = 9001, model_source = "GO", ver
 
 `
 MulEA::saveModelFromDataFrameToGmtFile(modelDF = modelDfFromLocalDB, gmtFilePath = "/home/koralgooll/doktorat/Rpackages/mulea/Mulea/example/fromDf.gmt")
-MulEA::saveModelFromLocalDatabaseToFile(taxonomy_id = 9001, model_source = "GO", version = 0, gmtFilePath = "/home/koralgooll/doktorat/Rpackages/mulea/Mulea/example/fromDb.gmt")
 `
 
 [Statistical set bases tests](#contingency-table-base).

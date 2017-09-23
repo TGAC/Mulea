@@ -12,6 +12,11 @@
 \arguments{
 \item{testObject}{Object of s4 class represents Mulea Test.}
 }
+\value{
+MuleaHypergeometricTest object. Used as private function.
+
+runTest method for MuleaHypergeometricTest object. Used as private function.
+}
 \description{
 PRIVATE class : An S4 class to represent a Hypergeometric tests in Mulea.
 }
@@ -30,3 +35,11 @@ PRIVATE class : An S4 class to represent a Hypergeometric tests in Mulea.
 \item{\code{pool}}{A background data to count test.}
 }}
 
+\examples{
+\dontrun{
+#It is a private s4 object. Look at SetBasedTest's examples.
+}
+\dontrun{
+#It is a private method. Look at runTest of SetBasedTest's examples.
+}
+}

@@ -4,6 +4,11 @@
 #' @slot gmt A data.frame representing GMT's reprezentation of model.
 #' @slot testData A data from expeciment to analize accross model.
 #' @slot numberOfPermutations A number of permutations used in renked test.
+#' @return KolmogorovSmirnovTest object. Used as private object.
+#' @examples
+#' \dontrun{
+#' #It is a private s4 object. Look at SetBasedTest's examples.
+#' }
 KolmogorovSmirnovTest <- setClass("KolmogorovSmirnovTest",
                                   slots = list(
                                     gmt = "data.frame",
@@ -48,6 +53,11 @@ setMethod("initialize", "KolmogorovSmirnovTest",
 
 #' @describeIn KolmogorovSmirnovTest runs test calculations.
 #' @param testObject Object of s4 class represents Mulea Test.
+#' @return runTest method for KolmogorovSmirnovTest object. Used as private function.
+#' @examples
+#' \dontrun{
+#' #It is a private method. Look at runTest of RankedBasedTest's examples.
+#' }
 setMethod("runTest",
           signature(testObject = "KolmogorovSmirnovTest"),
           function(testObject) {

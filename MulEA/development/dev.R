@@ -43,6 +43,7 @@ devtools::check()
 source("https://bioconductor.org/biocLite.R")
 biocLite("BiocCheck")
 library(BiocCheck)
+cat("\014")
 #Do BiocCheck on development version of package, not installed. :P
 BiocCheck::BiocCheck(getwd())
 
@@ -78,3 +79,5 @@ devtools::has_devel()
 # SOLUTION
 find.package("BiocCheck")
 #Do what is in instruction. Copy that file please. :)
+
+

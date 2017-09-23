@@ -55,11 +55,11 @@ Example of results in data.frame form:
 ```
 |ontologyId |ontologyName                                         |listOfValues                                                                                           |   p.value|  
 |:----------|:----------------------------------------------------|:------------------------------------------------------------------------------------------------------|---------:|  
-|GO:0000001 |"mitochondrion inheritance"                          |FBgn0033690, FBgn0261618                                                                               | 0.4523810|
-|GO:0000002 |"mitochondrial genome maintenance"                   |FBgn0004407, FBgn0010438, FBgn0032154, FBgn0039930, FBgn0040268, FBgn0013674, FBgn0037008, FBgn0003116 | 0.0256410|
-|GO:0000009 |"alpha-1,6-mannosyltransferase activity"             |FBgn0037743, FBgn0035401                                                                               |        NA|
-|GO:0000010 |"trans-hexaprenyltranstransferase activity"          |FBgn0037044, FBgn0051005                                                                               | 0.8587571|
-|GO:0000012 |"single strand break repair"                         |FBgn0026737, FBgn0026751, FBgn0038704                                                                  | 0.2820513|
-|GO:0000014 |"single-stranded DNA endodeoxyribonuclease activity" |FBgn0002887, FBgn0028434, FBgn0030170, FBgn0263831                                                     | 0.1901596|
-|GO:0000015 |"phosphopyruvate hydratase complex"                  |FBgn0000579                                                                                            | 0.1410256|
+|ID:0000001 |"mitochondrion inheritance"                          |FBgn0033690, FBgn0261618                                                                               | 0.4523810|
+|ID:0000002 |"mitochondrial genome maintenance"                   |FBgn0004407, FBgn0010438, FBgn0032154, FBgn0039930, FBgn0040268, FBgn0013674, FBgn0037008, FBgn0003116 | 0.0256410|
+|ID:0000009 |"alpha-1,6-mannosyltransferase activity"             |FBgn0037743, FBgn0035401                                                                               |        NA|
+|ID:0000010 |"trans-hexaprenyltranstransferase activity"          |FBgn0037044, FBgn0051005                                                                               | 0.8587571|
+|ID:0000012 |"single strand break repair"                         |FBgn0026737, FBgn0026751, FBgn0038704                                                                  | 0.2820513|
+|ID:0000014 |"single-stranded DNA endodeoxyribonuclease activity" |FBgn0002887, FBgn0028434, FBgn0030170, FBgn0263831                                                     | 0.1901596|
+|ID:0000015 |"phosphopyruvate hydratase complex"                  |FBgn0000579                                                                                            | 0.1410256|
 ```

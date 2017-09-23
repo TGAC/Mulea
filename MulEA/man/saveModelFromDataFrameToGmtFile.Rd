@@ -17,3 +17,12 @@ Return gmt file under specific location which include model in gmt format.
 \description{
 \code{saveModelFromDataFrameToGmtFile} saves copy of the model from data frame in gmt file.
 }
+\examples{
+muleaPkgDir <- find.package("MulEA")
+modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = paste(muleaPkgDir,"/example/model.gmt", sep = ""))
+creationOfLocalDB <- MulEA::startLocalDatabase(":memory:")
+MulEA::addModelToLocalDatabase(model = modelDfFromFile, taxonomy_id = 9001, model_source = "GO", version = 0)
+modelDfFromLocalDB <- MulEA::getModelFromLocalDatabaseAsDf(taxonomy_id = 9001, model_source = "GO", version = 0)
+MulEA::saveModelFromDataFrameToGmtFile(modelDF = modelDfFromLocalDB, gmtFilePath = "~/fromDb.gmt")
+stopDbResults <- MulEA::stopLocalDatabase()
+}

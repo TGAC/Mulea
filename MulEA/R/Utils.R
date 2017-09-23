@@ -7,7 +7,9 @@
 #' @param gmtFilePath path with name of file, where the file is localized. Example: "/home/mulea/files/lastModel.gmt"
 #'
 #' @return Return data frame with model from specific location.
-#'
+#' @examples
+#' muleaPkgDir <- find.package("MulEA")
+#' modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = paste(muleaPkgDir,"/example/model.gmt", sep = ""))
 readGmtFileAsDF <- function(gmtFilePath) {
     fileConnection <- file(gmtFilePath)
     lines <- readLines(fileConnection)
@@ -44,7 +46,14 @@ readGmtFileAsPlaneDF <- function(gmtFilePath) {
 #' @param gmtFilePath path with name of file, where to save model. Example: "/hmoe/mulea/files/lastModel.gmt"
 #'
 #' @return Return gmt file under specific location which include model in gmt format.
-#'
+#' @examples
+#' muleaPkgDir <- find.package("MulEA")
+#' modelDfFromFile <- MulEA::readGmtFileAsDF(gmtFilePath = paste(muleaPkgDir,"/example/model.gmt", sep = ""))
+#' creationOfLocalDB <- MulEA::startLocalDatabase(":memory:")
+#' MulEA::addModelToLocalDatabase(model = modelDfFromFile, taxonomy_id = 9001, model_source = "GO", version = 0)
+#' modelDfFromLocalDB <- MulEA::getModelFromLocalDatabaseAsDf(taxonomy_id = 9001, model_source = "GO", version = 0)
+#' MulEA::saveModelFromDataFrameToGmtFile(modelDF = modelDfFromLocalDB, gmtFilePath = "~/fromDb.gmt")
+#' stopDbResults <- MulEA::stopLocalDatabase()
 saveModelFromDataFrameToGmtFile <- function(modelDF, gmtFilePath) {
     vectorOfModel <- plyr::daply(.data = modelDF, .variables = c("ontologyId"), .fun = function(dataFrameRow){
         collapsedListOfValues <- paste(dataFrameRow[,3][[1]], collapse = "\t")
