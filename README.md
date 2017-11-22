@@ -1,6 +1,6 @@
 
 # MulEA
-An R-package for fast analysis of bioligical data. The package implements three different approaches of this type of analysis. This file include blueprint of package possibilities, to see more ... 
+Package development is moved to https://github.com/koralgooll/MulEA 
 
 
 ## Installation
